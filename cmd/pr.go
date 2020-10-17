@@ -1,12 +1,16 @@
 package cmd
 
 import (
+	"github.com/craftamap/bb/internal"
 	"github.com/spf13/cobra"
 )
 
 var (
 	prCommand = cobra.Command{
 		Use: "pr",
+		Run: func(cmd *cobra.Command, args []string) {
+			internal.PrList(globalOpts.Username, globalOpts.Password, globalOpts.RepoOrga, globalOpts.RepoSlug)
+		},
 	}
 	prListCommand = cobra.Command{
 		Use: "list",

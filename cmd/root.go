@@ -10,12 +10,28 @@ import (
 	"github.com/spf13/viper"
 )
 
+type GlobalOptions struct {
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	RepoOrga string `mapstructure:"repoOrga"`
+	RepoSlug string `mapstructure:"repoSlug"`
+}
+
 var (
 	rootCmd = &cobra.Command{
 		Use: "bb",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			viper.Unmarshal(&globalOpts)
+		},
 	}
 
-	cfgFile string
+	cfgFile    string
+	globalOpts = GlobalOptions{}
+
+	username string
+	password string
+	repoOrga string
+	repoSlug string
 )
 
 func Execute() error {
@@ -23,9 +39,18 @@ func Execute() error {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/bb)")
-
 	cobra.OnInitialize(initConfig)
+
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/bb)")
+	rootCmd.PersistentFlags().StringVar(&username, "username", "", "username")
+	rootCmd.PersistentFlags().StringVar(&password, "password", "", "app password")
+	rootCmd.PersistentFlags().StringVar(&repoOrga, "repo-orga", "", "repository organisation")
+	rootCmd.PersistentFlags().StringVar(&repoSlug, "repo-slug", "", "repository slug")
+
+	viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
+	viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
+	viper.BindPFlag("repoOrga", rootCmd.PersistentFlags().Lookup("repo-orga"))
+	viper.BindPFlag("repoSlug", rootCmd.PersistentFlags().Lookup("repo-slug"))
 }
 
 func initConfig() {
@@ -43,9 +68,6 @@ func initConfig() {
 			}
 			defer fh.Close()
 		}
-
-		viper.AddConfigPath(configDir)
-		viper.SetConfigName("configuration.toml")
 	}
 
 	viper.SetConfigFile(cfgFile)
@@ -53,6 +75,7 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()
+
 	if err != nil { // Handle errors reading the config file
 		panic(fmt.Errorf("fatal error config file: %s", err))
 	}
