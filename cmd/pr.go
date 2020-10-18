@@ -1,16 +1,16 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/craftamap/bb/internal"
+	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
 
 var (
 	prCommand = cobra.Command{
 		Use: "pr",
-		Run: func(cmd *cobra.Command, args []string) {
-			internal.PrList(globalOpts.Username, globalOpts.Password, globalOpts.RepoOrga, globalOpts.RepoSlug)
-		},
 	}
 	prListCommand = cobra.Command{
 		Use: "list",
@@ -34,6 +34,10 @@ func init() {
 }
 
 func list(cmd *cobra.Command, args []string) {
+	err := internal.PrList(globalOpts.Username, globalOpts.Password, globalOpts.RepoOrga, globalOpts.RepoSlug)
+	if err != nil {
+		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+	}
 }
 
 func view(cmd *cobra.Command, args []string) {
