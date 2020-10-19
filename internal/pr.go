@@ -133,3 +133,28 @@ func PrView(username string, password string, repoOrga string, repoSlug string, 
 	}
 	return &pullRequest, nil
 }
+
+func PrCreate(username string, password string, repoOrga string, repoSlug string, sourceBranch string, destinationBranch string, title string) (*PullRequest, error) {
+	client := bitbucket.NewBasicAuth(username, password)
+
+	opt := &bitbucket.PullRequestsOptions{
+		Owner:             repoOrga,
+		RepoSlug:          repoSlug,
+		SourceBranch:      sourceBranch,
+		DestinationBranch: destinationBranch,
+		Title:             title,
+	}
+
+	response, err := client.Repositories.PullRequests.Create(opt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var pullRequest PullRequest
+	err = mapstructure.Decode(response, &pullRequest)
+	if err != nil {
+		return nil, err
+	}
+	return &pullRequest, nil
+}

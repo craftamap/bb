@@ -13,8 +13,6 @@ import (
 type GlobalOptions struct {
 	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
-	RepoOrga string `mapstructure:"repoOrga"`
-	RepoSlug string `mapstructure:"repoSlug"`
 }
 
 var (
