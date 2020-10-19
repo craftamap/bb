@@ -60,6 +60,10 @@ func view(cmd *cobra.Command, args []string) {
 	}
 
 	pr, err := internal.PrView(globalOpts.Username, globalOpts.Password, globalOpts.RepoOrga, globalOpts.RepoSlug, fmt.Sprintf("%d", prs.Values[0].ID))
+	if err != nil {
+		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+		return
+	}
 
 	fmt.Println(aurora.Bold(pr.Title))
 	var state string
@@ -79,6 +83,9 @@ func view(cmd *cobra.Command, args []string) {
 		return
 	}
 	fmt.Println(out)
+
+	footer := aurora.BrightBlack(fmt.Sprintf("View this pull request on Bitbucket.org: %s\n", pr.Links["html"].Href)).String()
+	fmt.Printf(footer)
 	// fmt.Println(pr, err)
 
 }

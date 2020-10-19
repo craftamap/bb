@@ -17,19 +17,24 @@ type ListPullRequests struct {
 }
 
 type PullRequest struct {
-	ID                int      `mapstructure:"id"`
-	Title             string   `mapstructure:"title"`
-	State             string   `mapstructure:"state"`
-	Source            Resource `mapstructure:"source"`
-	Destination       Resource `mapstructure:"destination"`
-	Type              string   `mapstructure:"type"`
-	TaskCount         int      `mapstructure:"task_count"`
-	Description       string   `mapstructure:"description"`
-	Author            User     `mapstructure:"author"`
-	CloseSourceBranch bool     `mapstructure:"close_source_branch"`
-	CommentCount      int      `mapstructure:"comment_count"`
-	CreatedOn         string   `mapstructure:"created_on"`
-	MergeCommit       Commit   `mapstructure:"merge_commit"`
+	ID                int             `mapstructure:"id"`
+	Title             string          `mapstructure:"title"`
+	State             string          `mapstructure:"state"`
+	Source            Resource        `mapstructure:"source"`
+	Destination       Resource        `mapstructure:"destination"`
+	Type              string          `mapstructure:"type"`
+	TaskCount         int             `mapstructure:"task_count"`
+	Description       string          `mapstructure:"description"`
+	Author            User            `mapstructure:"author"`
+	CloseSourceBranch bool            `mapstructure:"close_source_branch"`
+	CommentCount      int             `mapstructure:"comment_count"`
+	CreatedOn         string          `mapstructure:"created_on"`
+	MergeCommit       Commit          `mapstructure:"merge_commit"`
+	Links             map[string]Link `mapstructure:"links"`
+}
+
+type Link struct {
+	Href string `mapstructure:"href"`
 }
 
 type Resource struct {
