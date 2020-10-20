@@ -10,6 +10,7 @@ require (
 	github.com/ktrysmt/go-bitbucket v0.6.4
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mitchellh/mapstructure v1.3.3
+	github.com/spance/go-callprivate v0.0.0-20151213012958-d8b9b5523668 // indirect
 	github.com/spf13/cobra v1.1.0
 	github.com/spf13/viper v1.7.0
 )

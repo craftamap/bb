@@ -5,15 +5,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/craftamap/bb/cmd/commands/pr"
+	"github.com/craftamap/bb/cmd/options"
 	"github.com/kirsle/configdir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-type GlobalOptions struct {
-	Username string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
-}
 
 var (
 	rootCmd = &cobra.Command{
@@ -24,7 +21,7 @@ var (
 	}
 
 	cfgFile    string
-	globalOpts = GlobalOptions{}
+	globalOpts = options.GlobalOptions{}
 
 	username string
 	password string
@@ -49,6 +46,8 @@ func init() {
 	viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
 	viper.BindPFlag("repoOrga", rootCmd.PersistentFlags().Lookup("repo-orga"))
 	viper.BindPFlag("repoSlug", rootCmd.PersistentFlags().Lookup("repo-slug"))
+
+	pr.Add(rootCmd, &globalOpts)
 }
 
 func initConfig() {
