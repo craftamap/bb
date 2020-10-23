@@ -14,12 +14,16 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	listCmd := &cobra.Command{
 		Use: "list",
 		Run: func(cmd *cobra.Command, args []string) {
+			c := internal.Client{
+				Username: globalOpts.Username,
+				Password: globalOpts.Password,
+			}
 			bbrepo, err := bbgit.GetBitbucketRepo()
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
-			prs, err := internal.PrList(globalOpts.Username, globalOpts.Password, bbrepo.RepoOrga, bbrepo.RepoSlug)
+			prs, err := c.PrList(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 			}

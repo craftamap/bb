@@ -19,6 +19,10 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		Run: func(cmd *cobra.Command, args []string) {
 			var id int
 			var err error
+			c := internal.Client{
+				Username: globalOpts.Username,
+				Password: globalOpts.Password,
+			}
 
 			bbrepo, err := bbgit.GetBitbucketRepo()
 
@@ -40,7 +44,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					return
 				}
 
-				prs, err := internal.GetPrIDBySourceBranch(globalOpts.Username, globalOpts.Password, bbrepo.RepoOrga, bbrepo.RepoSlug, branchName)
+				prs, err := c.GetPrIDBySourceBranch(bbrepo.RepoOrga, bbrepo.RepoSlug, branchName)
 				if err != nil {
 					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 					return
@@ -54,7 +58,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			}
 
-			pr, err := internal.PrView(globalOpts.Username, globalOpts.Password, bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
+			pr, err := c.PrView(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return

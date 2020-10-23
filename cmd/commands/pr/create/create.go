@@ -29,6 +29,11 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				reviewers    []string
 			)
 
+			c := internal.Client{
+				Username: globalOpts.Username,
+				Password: globalOpts.Password,
+			}
+
 			bbrepo, err := bbgit.GetBitbucketRepo()
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
@@ -41,7 +46,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 
-			repo, err := internal.RepositoryGet(globalOpts.Username, globalOpts.Password, bbrepo.RepoOrga, bbrepo.RepoSlug)
+			repo, err := c.RepositoryGet(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
@@ -59,7 +64,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			if title == "" {
 				questionTitle := &survey.Input{
 					Message: "Title",
-					Default: title,
+					Default: sourceBranch,
 				}
 				err = survey.AskOne(questionTitle, &title)
 			}
@@ -99,9 +104,10 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			}
 
-			response, err := internal.PrCreate(globalOpts.Username, globalOpts.Password, bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch, title, body, reviewers)
+			response, err := c.PrCreate(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch, title, body, reviewers)
+			fmt.Println(targetBranch)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
 

@@ -44,8 +44,8 @@ type Commit struct {
 	Type string `mapstructure:"type"`
 }
 
-func PrList(username string, password string, repoOrga string, repoSlug string) (*ListPullRequests, error) {
-	client := bitbucket.NewBasicAuth(username, password)
+func (c Client) PrList(repoOrga string, repoSlug string) (*ListPullRequests, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
 	opt := &bitbucket.PullRequestsOptions{
 		Owner:    repoOrga,
@@ -66,8 +66,8 @@ func PrList(username string, password string, repoOrga string, repoSlug string) 
 	return &pullRequests, nil
 }
 
-func GetPrIDBySourceBranch(username string, password string, repoOrga string, repoSlug string, sourceBranch string) (*ListPullRequests, error) {
-	client := bitbucket.NewBasicAuth(username, password)
+func (c Client) GetPrIDBySourceBranch(repoOrga string, repoSlug string, sourceBranch string) (*ListPullRequests, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
 	opt := &bitbucket.PullRequestsOptions{
 		Owner:    repoOrga,
@@ -89,8 +89,8 @@ func GetPrIDBySourceBranch(username string, password string, repoOrga string, re
 	return &pullRequests, nil
 }
 
-func PrView(username string, password string, repoOrga string, repoSlug string, id string) (*PullRequest, error) {
-	client := bitbucket.NewBasicAuth(username, password)
+func (c Client) PrView(repoOrga string, repoSlug string, id string) (*PullRequest, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
 	opt := &bitbucket.PullRequestsOptions{
 		Owner:    repoOrga,
@@ -111,8 +111,8 @@ func PrView(username string, password string, repoOrga string, repoSlug string, 
 	return &pullRequest, nil
 }
 
-func PrCreate(username string, password string, repoOrga string, repoSlug string, sourceBranch string, destinationBranch string, title string, body string, reviewers []string) (*PullRequest, error) {
-	client := bitbucket.NewBasicAuth(username, password)
+func (c Client) PrCreate(repoOrga string, repoSlug string, sourceBranch string, destinationBranch string, title string, body string, reviewers []string) (*PullRequest, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
 	opt := &bitbucket.PullRequestsOptions{
 		Owner:             repoOrga,
@@ -138,8 +138,8 @@ func PrCreate(username string, password string, repoOrga string, repoSlug string
 	return &pullRequest, nil
 }
 
-func PrDefaultBody(username string, password string, repoOrga string, repoSlug string, sourceBranch string, destinationBranch string) (string, error) {
-	client := bitbucket.NewBasicAuth(username, password)
+func (c Client) PrDefaultBody(repoOrga string, repoSlug string, sourceBranch string, destinationBranch string) (string, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
 	opts := bitbucket.CommitsOptions{
 		Owner:    repoOrga,

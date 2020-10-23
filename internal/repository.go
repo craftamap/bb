@@ -29,12 +29,12 @@ type Repository struct {
 	// Project     Project         `mapstructure:"project"`
 }
 
-func RepositoryGet(username string, password string, repoOrga string, repoSlug string) (*Repository, error) {
+func (c Client) RepositoryGet(repoOrga string, repoSlug string) (*Repository, error) {
 	client := bitbucket.NewAPIClient(bitbucket.NewConfiguration())
 	response, _, err := client.RepositoriesApi.RepositoriesUsernameRepoSlugGet(
 		context.WithValue(context.Background(), bitbucket.ContextBasicAuth, bitbucket.BasicAuth{
-			UserName: username,
-			Password: password,
+			UserName: c.Username,
+			Password: c.Password,
 		}), repoOrga, repoSlug)
 
 	fmt.Printf("%#v\n", response)
