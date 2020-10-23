@@ -25,16 +25,12 @@ type PullRequest struct {
 	Type              string          `mapstructure:"type"`
 	TaskCount         int             `mapstructure:"task_count"`
 	Description       string          `mapstructure:"description"`
-	Author            User            `mapstructure:"author"`
+	Author            Account         `mapstructure:"author"`
 	CloseSourceBranch bool            `mapstructure:"close_source_branch"`
 	CommentCount      int             `mapstructure:"comment_count"`
 	CreatedOn         string          `mapstructure:"created_on"`
 	MergeCommit       Commit          `mapstructure:"merge_commit"`
 	Links             map[string]Link `mapstructure:"links"`
-}
-
-type Link struct {
-	Href string `mapstructure:"href"`
 }
 
 type Resource struct {
@@ -43,28 +39,9 @@ type Resource struct {
 	Repository Repository `mapstructure:"repository"`
 }
 
-type Branch struct {
-	Name string `mapstructure:"name"`
-}
-
 type Commit struct {
 	Hash string `mapstructure:"hash"`
 	Type string `mapstructure:"type"`
-}
-
-type Repository struct {
-	FullName string `mapstructure:"full_name"`
-	Name     string `mapstructure:"name"`
-	Type     string `mapstructure:"type"`
-	UUID     string `mapstructure:"uuid"`
-}
-
-type User struct {
-	AccountID   string `mapstructure:"account_id"`
-	DisplayName string `mapstructure:"display_name"`
-	Nickname    string `mapstructure:"nickname"`
-	Type        string `mapstructure:"user"`
-	UUID        string `mapstructure:"uuid"`
 }
 
 func PrList(username string, password string, repoOrga string, repoSlug string) (*ListPullRequests, error) {
@@ -134,7 +111,7 @@ func PrView(username string, password string, repoOrga string, repoSlug string, 
 	return &pullRequest, nil
 }
 
-func PrCreate(username string, password string, repoOrga string, repoSlug string, sourceBranch string, destinationBranch string, title string) (*PullRequest, error) {
+func PrCreate(username string, password string, repoOrga string, repoSlug string, sourceBranch string, destinationBranch string, title string, body string, reviewers []string) (*PullRequest, error) {
 	client := bitbucket.NewBasicAuth(username, password)
 
 	opt := &bitbucket.PullRequestsOptions{
@@ -143,6 +120,8 @@ func PrCreate(username string, password string, repoOrga string, repoSlug string
 		SourceBranch:      sourceBranch,
 		DestinationBranch: destinationBranch,
 		Title:             title,
+		Description:       body,
+		Reviewers:         reviewers,
 	}
 
 	response, err := client.Repositories.PullRequests.Create(opt)
@@ -157,4 +136,22 @@ func PrCreate(username string, password string, repoOrga string, repoSlug string
 		return nil, err
 	}
 	return &pullRequest, nil
+}
+
+func PrDefaultBody(username string, password string, repoOrga string, repoSlug string, sourceBranch string, destinationBranch string) (string, error) {
+	client := bitbucket.NewBasicAuth(username, password)
+
+	opts := bitbucket.CommitsOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		Revision: sourceBranch,
+		Exclude:  destinationBranch,
+	}
+
+	response, err := client.Repositories.Commits.GetCommits(&opts)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%#v", response), nil
 }

@@ -21,24 +21,39 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	createCmd := &cobra.Command{
 		Use: "create",
 		Run: func(cmd *cobra.Command, args []string) {
+			var (
+				sourceBranch string
+				targetBranch string
+				title        string
+				body         string
+				reviewers    []string
+			)
+
 			bbrepo, err := bbgit.GetBitbucketRepo()
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
 
-			branchName, err := git.CurrentBranch()
+			sourceBranch, err = git.CurrentBranch()
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
+
+			repo, err := internal.RepositoryGet(globalOpts.Username, globalOpts.Password, bbrepo.RepoOrga, bbrepo.RepoSlug)
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				return
+			}
+			targetBranch = repo.MainBranch.Name
 
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
 
-			fmt.Printf("Creating pull request for %s into %s in %s\n", branchName, "X", fmt.Sprintf("%s/%s", bbrepo.RepoOrga, bbrepo.RepoSlug))
+			fmt.Printf("Creating pull request for %s into %s in %s\n", sourceBranch, "X", fmt.Sprintf("%s/%s", bbrepo.RepoOrga, bbrepo.RepoSlug))
 			fmt.Println()
 
 			answers := struct {
@@ -53,7 +68,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					Name: "title",
 					Prompt: &survey.Input{
 						Message: "Title",
-						Default: branchName,
+						Default: sourceBranch,
 					},
 					Validate: survey.Required,
 				},
@@ -61,7 +76,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					Name: "action",
 					Prompt: &survey.Select{
 						Message: "What's next?",
-						Options: []string{"create", "cancel", "continue in browser"},
+						Options: []string{"create", "modify body", "set reviewers", "change destination branch", "cancel"},
 						Default: "create",
 					},
 				},
@@ -72,8 +87,10 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 
+			title = answers.Title
+
 			if answers.Action == "create" {
-				response, err := internal.PrCreate(globalOpts.Username, globalOpts.Password, bbrepo.RepoOrga, bbrepo.RepoSlug, branchName, "master", answers.Title)
+				response, err := internal.PrCreate(globalOpts.Username, globalOpts.Password, bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch, title, body, reviewers)
 				if err != nil {
 					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 					return
