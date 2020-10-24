@@ -72,6 +72,16 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
+
+			if body == "" {
+				body, err = c.PrDefaultBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
+				if err != nil {
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+					return
+				}
+				fmt.Println(body)
+			}
+
 			for {
 				selectNext := &survey.Select{
 					Message: "What's next?",

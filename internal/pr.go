@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/ktrysmt/go-bitbucket"
 	"github.com/mitchellh/mapstructure"
@@ -37,11 +38,6 @@ type Resource struct {
 	Branch     Branch     `mapstructure:"branch"`
 	Commit     Commit     `mapstructure:"commit"`
 	Repository Repository `mapstructure:"repository"`
-}
-
-type Commit struct {
-	Hash string `mapstructure:"hash"`
-	Type string `mapstructure:"type"`
 }
 
 func (c Client) PrList(repoOrga string, repoSlug string) (*ListPullRequests, error) {
@@ -139,19 +135,15 @@ func (c Client) PrCreate(repoOrga string, repoSlug string, sourceBranch string, 
 }
 
 func (c Client) PrDefaultBody(repoOrga string, repoSlug string, sourceBranch string, destinationBranch string) (string, error) {
-	client := bitbucket.NewBasicAuth(c.Username, c.Password)
-
-	opts := bitbucket.CommitsOptions{
-		Owner:    repoOrga,
-		RepoSlug: repoSlug,
-		Revision: sourceBranch,
-		Exclude:  destinationBranch,
-	}
-
-	response, err := client.Repositories.Commits.GetCommits(&opts)
+	commits, err := c.GetCommits(repoOrga, repoSlug, sourceBranch, "", destinationBranch)
 	if err != nil {
 		return "", err
 	}
 
-	return fmt.Sprintf("%#v", response), nil
+	var sb strings.Builder
+	for _, commit := range commits.Values {
+		sb.WriteString(" - " + commit.Message + "\n")
+	}
+
+	return sb.String(), nil
 }

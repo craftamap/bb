@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -37,7 +36,6 @@ func (c Client) RepositoryGet(repoOrga string, repoSlug string) (*Repository, er
 			Password: c.Password,
 		}), repoOrga, repoSlug)
 
-	fmt.Printf("%#v\n", response)
 	if err != nil {
 		return nil, err
 	}
