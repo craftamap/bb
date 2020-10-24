@@ -2,9 +2,12 @@ package create
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/charmbracelet/glamour"
 	"github.com/cli/cli/git"
+	"github.com/cli/cli/pkg/surveyext"
 	"github.com/craftamap/bb/cmd/options"
 	bbgit "github.com/craftamap/bb/git"
 	"github.com/craftamap/bb/internal"
@@ -82,6 +85,11 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Println(body)
 			}
 
+			fmt.Println(aurora.Bold(aurora.Green("!").String() + " Body:"))
+
+			out, _ := glamour.Render(body, "dark")
+			fmt.Print(out)
+
 			for {
 				selectNext := &survey.Select{
 					Message: "What's next?",
@@ -102,6 +110,12 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				}
 
 				if doNext == "modify body" {
+					body, err = surveyext.Edit("vim", "", body, os.Stdin, os.Stdout, os.Stderr, nil)
+					if err != nil {
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+						return
+					}
+
 					continue
 				}
 
@@ -122,7 +136,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 
 			fmt.Printf("Take a look at your pull request here:\n")
-			fmt.Println(response)
+			fmt.Println(response.Links["html"].Href)
 
 		},
 	}

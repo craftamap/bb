@@ -142,7 +142,7 @@ func (c Client) PrDefaultBody(repoOrga string, repoSlug string, sourceBranch str
 
 	var sb strings.Builder
 	for _, commit := range commits.Values {
-		sb.WriteString(" - " + commit.Message + "\n")
+		sb.WriteString("- " + commit.Message + "\n")
 	}
 
 	return sb.String(), nil
