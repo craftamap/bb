@@ -28,6 +28,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				sourceBranch string
 				targetBranch string
 				title        string
+				defaultBody  string
 				body         string
 				reviewers    []string
 			)
@@ -40,6 +41,10 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			bbrepo, err := bbgit.GetBitbucketRepo()
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				return
+			}
+			if !bbrepo.IsBitbucketOrg() {
+				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Are you sure this is a bitbucket repo?")
 				return
 			}
 
@@ -77,11 +82,12 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 
 			if body == "" {
-				body, err = c.PrDefaultBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
+				defaultBody, err = c.PrDefaultBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
 				if err != nil {
 					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 					return
 				}
+				body = defaultBody
 				fmt.Println(body)
 			}
 
@@ -124,6 +130,19 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 						Message: "type your destination branch",
 						Default: targetBranch,
 					}, &targetBranch)
+
+					// We need to re-generate the body, if the destination branch is changed
+					// but only if the body was not modified in before
+
+					tempBody, err := c.PrDefaultBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
+					if err != nil {
+						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+						return
+					}
+					if body == defaultBody {
+						body = tempBody
+					}
+
 				}
 
 			}

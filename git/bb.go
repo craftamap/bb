@@ -42,3 +42,7 @@ func GetBitbucketRepo() (*BitbucketRepo, error) {
 
 	return &bbrepo, nil
 }
+
+func (b *BitbucketRepo) IsBitbucketOrg() bool {
+	return strings.Contains(b.Remote.FetchURL.String(), "bitbucket")
+}

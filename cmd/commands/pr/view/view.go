@@ -30,6 +30,10 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
+			if !bbrepo.IsBitbucketOrg() {
+				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Are you sure this is a bitbucket repo?")
+				return
+			}
 
 			if len(args) > 0 {
 				id, err = strconv.Atoi(args[0])
