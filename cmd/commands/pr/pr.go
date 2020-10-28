@@ -5,6 +5,7 @@ import (
 
 	"github.com/craftamap/bb/cmd/commands/pr/create"
 	"github.com/craftamap/bb/cmd/commands/pr/list"
+	"github.com/craftamap/bb/cmd/commands/pr/statuses"
 	"github.com/craftamap/bb/cmd/commands/pr/view"
 	"github.com/craftamap/bb/cmd/options"
 )
@@ -17,6 +18,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	list.Add(&prCommand, globalOpts)
 	view.Add(&prCommand, globalOpts)
 	create.Add(&prCommand, globalOpts)
+	statuses.Add(&prCommand, globalOpts)
 
 	rootCmd.AddCommand(&prCommand)
 }

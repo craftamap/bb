@@ -40,6 +40,29 @@ type Resource struct {
 	Repository Repository `mapstructure:"repository"`
 }
 
+type Status struct {
+	Type        string                 `mapstructure:"type"`
+	Links       map[string]interface{} `mapstructure:"links"`
+	UUID        string                 `mapstructure:"uuid"`
+	Key         string                 `mapstructure:"key"`
+	Refname     string                 `mapstructure:"refname"`
+	URL         string                 `mapstructure:"url"`
+	State       string                 `mapstructure:"state"`
+	Name        string                 `mapstructure:"name"`
+	Description string                 `mapstructure:"description"`
+	CreatedOn   string                 `mapstructure:"created_on"`
+	UpdatedOn   string                 `mapstructure:"updated_on"`
+}
+
+type Statuses struct {
+	Size     int      `mapstructure:"size"`
+	Page     int      `mapstructure:"page"`
+	PageLen  int      `mapstructure:"pagelen"`
+	Next     string   `mapstructure:"next"`
+	Previous string   `mapstructure:"previous"`
+	Values   []Status `mapstructure:"values"`
+}
+
 func (c Client) PrList(repoOrga string, repoSlug string) (*ListPullRequests, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
@@ -132,6 +155,29 @@ func (c Client) PrCreate(repoOrga string, repoSlug string, sourceBranch string, 
 		return nil, err
 	}
 	return &pullRequest, nil
+}
+
+func (c Client) PrStatuses(repoOrga string, repoSlug string, id string) (*Statuses, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+	opt := &bitbucket.PullRequestsOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	response, err := client.Repositories.PullRequests.Statuses(opt)
+	if err != nil {
+		return nil, err
+	}
+
+	var statuses Statuses
+	err = mapstructure.Decode(response, &statuses)
+	if err != nil {
+		return nil, err
+	}
+
+	return &statuses, nil
+
 }
 
 func (c Client) PrDefaultBody(repoOrga string, repoSlug string, sourceBranch string, destinationBranch string) (string, error) {

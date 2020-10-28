@@ -16,8 +16,7 @@ import (
 )
 
 var (
-	Body      string
-	Assignees []string
+	Body string
 )
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
@@ -81,7 +80,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 
-			if body == "" {
+			if Body == "" {
 				defaultBody, err = c.PrDefaultBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
 				if err != nil {
 					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
@@ -89,6 +88,8 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				}
 				body = defaultBody
 				fmt.Println(body)
+			} else {
+				body = Body
 			}
 
 			fmt.Println(aurora.Bold(aurora.Green("!").String() + " Body:"))
@@ -160,6 +161,5 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		},
 	}
 	createCmd.Flags().StringVarP(&Body, "body", "b", "", "Supply a body.")
-	createCmd.Flags().StringSliceVarP(&Assignees, "assignee", "a", nil, "Assign people by their `login`")
 	prCmd.AddCommand(createCmd)
 }
