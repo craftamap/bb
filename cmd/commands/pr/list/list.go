@@ -12,7 +12,9 @@ import (
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	listCmd := &cobra.Command{
-		Use: "list",
+		Use:   "list",
+		Short: "List and filter pull requests in this repository",
+		Long:  "List and filter pull requests in this repository",
 		Run: func(cmd *cobra.Command, args []string) {
 			c := internal.Client{
 				Username: globalOpts.Username,

@@ -14,7 +14,10 @@ import (
 
 var (
 	rootCmd = &cobra.Command{
-		Use: "bb",
+		Use:     "bb",
+		Short:   "Bitbucket.org CLI",
+		Long:    "Work seamlessly with Bitbucket.org from the command line.",
+		Example: `$ bb pr list`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			viper.Unmarshal(&globalOpts)
 		},

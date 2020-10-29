@@ -12,7 +12,9 @@ import (
 
 func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	prCommand := cobra.Command{
-		Use: "pr",
+		Use:   "pr",
+		Long:  "Work with pull requests",
+		Short: "Manage pull requests",
 	}
 
 	list.Add(&prCommand, globalOpts)

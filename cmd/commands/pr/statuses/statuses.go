@@ -14,7 +14,9 @@ import (
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	statusesCmd := &cobra.Command{
-		Use: "statuses",
+		Use:   "statuses",
+		Short: "Show CI status for a single pull request",
+		Long:  "Show CI status for a single pull request",
 		Run: func(cmd *cobra.Command, args []string) {
 			var id int
 			var err error

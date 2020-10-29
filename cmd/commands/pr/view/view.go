@@ -15,7 +15,9 @@ import (
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	viewCmd := &cobra.Command{
-		Use: "view",
+		Use:   "view",
+		Short: "View a pull request",
+		Long:  "Display the title, body, and other information about a pull request.",
 		Run: func(cmd *cobra.Command, args []string) {
 			var id int
 			var err error
