@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/craftamap/bb/cmd/commands/api"
 	"github.com/craftamap/bb/cmd/commands/pr"
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/kirsle/configdir"
@@ -51,6 +52,7 @@ func init() {
 	viper.BindPFlag("repoSlug", rootCmd.PersistentFlags().Lookup("repo-slug"))
 
 	pr.Add(rootCmd, &globalOpts)
+	api.Add(rootCmd, &globalOpts)
 }
 
 func initConfig() {

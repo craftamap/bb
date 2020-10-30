@@ -14,5 +14,6 @@ require (
 	github.com/spance/go-callprivate v0.0.0-20151213012958-d8b9b5523668 // indirect
 	github.com/spf13/cobra v1.1.0
 	github.com/spf13/viper v1.7.0
+	github.com/tidwall/pretty v1.0.2
 	github.com/wbrefvem/go-bitbucket v0.0.0-20190128183802-fc08fd046abb
 )
