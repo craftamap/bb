@@ -63,12 +63,13 @@ type Statuses struct {
 	Values   []Status `mapstructure:"values"`
 }
 
-func (c Client) PrList(repoOrga string, repoSlug string) (*ListPullRequests, error) {
+func (c Client) PrList(repoOrga string, repoSlug string, states []string) (*ListPullRequests, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
 	opt := &bitbucket.PullRequestsOptions{
 		Owner:    repoOrga,
 		RepoSlug: repoSlug,
+		States:   states,
 	}
 
 	response, err := client.Repositories.PullRequests.Gets(opt)
@@ -192,4 +193,47 @@ func (c Client) PrDefaultBody(repoOrga string, repoSlug string, sourceBranch str
 	}
 
 	return sb.String(), nil
+}
+
+func (c Client) PrCommits(repoOrga string, repoSlug string, id string) (*Commits, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opt := &bitbucket.PullRequestsOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+	response, err := client.Repositories.PullRequests.Commits(opt)
+	if err != nil {
+		return nil, err
+	}
+
+	var commits Commits
+	err = mapstructure.Decode(response, &commits)
+	if err != nil {
+		return nil, err
+	}
+	return &commits, nil
+}
+
+func (c Client) PrMerge(repoOrga string, repoSlug string, id string) (*PullRequest, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opt := &bitbucket.PullRequestsOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	response, err := client.Repositories.PullRequests.Merge(opt)
+	if err != nil {
+		return nil, err
+	}
+
+	var pullRequest PullRequest
+	err = mapstructure.Decode(response, &pullRequest)
+	if err != nil {
+		return nil, err
+	}
+	return &pullRequest, nil
 }

@@ -16,7 +16,8 @@ import (
 )
 
 var (
-	Body string
+	Body  string
+	Force bool
 )
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
@@ -150,17 +151,15 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 
 			response, err := c.PrCreate(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch, title, body, reviewers)
-			fmt.Println(targetBranch)
 			if err != nil {
 				fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
 
-			fmt.Printf("Take a look at your pull request here:\n")
-			fmt.Println(response.Links["html"].Href)
-
+			fmt.Printf("Take a look at your pull request here: %s\n", aurora.Index(242, response.Links["html"].Href))
 		},
 	}
 	createCmd.Flags().StringVarP(&Body, "body", "b", "", "Supply a body.")
+	createCmd.Flags().BoolVar(&Force, "force", false, "force creation")
 	prCmd.AddCommand(createCmd)
 }

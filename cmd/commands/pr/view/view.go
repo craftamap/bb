@@ -10,7 +10,12 @@ import (
 	bbgit "github.com/craftamap/bb/git"
 	"github.com/craftamap/bb/internal"
 	"github.com/logrusorgru/aurora"
+	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
+)
+
+var (
+	Web bool
 )
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
@@ -69,33 +74,58 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
-
-			fmt.Println(aurora.Bold(pr.Title))
-			var state string
-			if pr.State == "OPEN" {
-				state = aurora.Green("Open").String()
-			} else if pr.State == "DECLINED" {
-				state = aurora.Red("Declined").String()
-			} else {
-				state = pr.State
-			}
-
-			infoText := aurora.BrightBlack(fmt.Sprintf("%s wants to merge X commits into %s from %s\n", pr.Author.Nickname, pr.Destination.Branch.Name, pr.Source.Branch.Name))
-			fmt.Printf("%s • %s\n", state, infoText)
-			if pr.Description != "" {
-				out, err := glamour.Render(pr.Description, "dark")
+			if Web {
+				err := browser.OpenURL(pr.Links["html"].Href)
 				if err != nil {
 					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 					return
 				}
-				fmt.Println(out)
+				return
 			}
 
-			footer := aurora.BrightBlack(fmt.Sprintf("View this pull request on Bitbucket.org: %s", pr.Links["html"].Href)).String()
-			fmt.Println(footer)
-			// fmt.Println(pr, err)
+			commits, err := c.PrCommits(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				return
+			}
 
+			PrintSummary(pr, commits)
 		},
 	}
+	viewCmd.Flags().BoolVar(&Web, "web", false, "view the pull request in your browser")
 	prCmd.AddCommand(viewCmd)
+}
+
+func PrintSummary(pr *internal.PullRequest, commits *internal.Commits) {
+	fmt.Println(aurora.Bold(pr.Title))
+	var state string
+	if pr.State == "OPEN" {
+		state = aurora.Green("Open").String()
+	} else if pr.State == "DECLINED" {
+		state = aurora.Red("Declined").String()
+	} else {
+		state = pr.State
+	}
+
+	nrOfCommits := len(commits.Values)
+	nrOfCommitsStr := fmt.Sprintf("%d", nrOfCommits)
+	if nrOfCommits == 10 {
+		nrOfCommitsStr = nrOfCommitsStr + "+"
+	}
+
+	infoText := aurora.Index(242, fmt.Sprintf("%s wants to merge %s commits into %s from %s\n", pr.Author.Nickname, nrOfCommitsStr, pr.Destination.Branch.Name, pr.Source.Branch.Name))
+	fmt.Printf("%s • %s\n", state, infoText)
+	if pr.Description != "" {
+		out, err := glamour.Render(pr.Description, "dark")
+		if err != nil {
+			fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+			return
+		}
+		fmt.Println(out)
+	}
+
+	footer := aurora.Index(242, fmt.Sprintf("View this pull request on Bitbucket.org: %s", pr.Links["html"].Href)).String()
+	fmt.Println(footer)
+	// fmt.Println(pr, err)
+
 }

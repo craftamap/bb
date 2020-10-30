@@ -2,12 +2,20 @@ package list
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/craftamap/bb/cmd/options"
 	bbgit "github.com/craftamap/bb/git"
 	"github.com/craftamap/bb/internal"
 	"github.com/logrusorgru/aurora"
+	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
+	"github.com/wbrefvem/go-bitbucket"
+)
+
+var (
+	Web   bool
+	State string
 )
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
@@ -29,7 +37,23 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Are you sure this is a bitbucket repo?")
 				return
 			}
-			prs, err := c.PrList(bbrepo.RepoOrga, bbrepo.RepoSlug)
+
+			if Web {
+				repo, err := c.RepositoryGet(bbrepo.RepoOrga, bbrepo.RepoSlug)
+				if err != nil {
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				}
+
+				linkWrapper := repo.Links["Html"].(*bitbucket.SubjectTypesRepositoryEvents)
+				link := linkWrapper.Href + "/pull-requests"
+				browser.OpenURL(link)
+
+				return
+			}
+
+			state := strings.ToUpper(State)
+
+			prs, err := c.PrList(bbrepo.RepoOrga, bbrepo.RepoSlug, []string{state})
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 			}
@@ -42,5 +66,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 		},
 	}
+	listCmd.Flags().StringVar(&State, "state", "open", "Filter by state: {open|merged|declined|superseded}")
+	listCmd.Flags().BoolVar(&Web, "web", false, "view pull requests in your browser")
 	prCmd.AddCommand(listCmd)
 }
