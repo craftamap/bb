@@ -54,6 +54,19 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
+			if !Force {
+				possiblePrs, err := c.GetPrIDBySourceBranch(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch)
+				// Note: We want err to be set here, since we don't want an existing pull request
+				if err != nil {
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+					return
+				}
+				if len(possiblePrs.Values) != 0 {
+					id := possiblePrs.Values[0].ID
+					fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), fmt.Sprintf("Pull request %d already exists for this branch. Use --force to ignore this.", id))
+					return
+				}
+			}
 
 			repo, err := c.RepositoryGet(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
