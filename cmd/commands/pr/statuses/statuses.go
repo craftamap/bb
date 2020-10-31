@@ -68,7 +68,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 
 			if len(statuses.Values) == 0 {
-				fmt.Printf("No builds/statuses found for this pull request")
+				fmt.Println("No builds/statuses found for this pull request")
 			} else {
 				var (
 					allChecksSuccessful = true
