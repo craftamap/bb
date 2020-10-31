@@ -14,15 +14,18 @@ import (
 )
 
 var (
-	Method string
+	Method  string
+	Headers []string
 )
 
 func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	apiCmd := &cobra.Command{
-		Use:   "api",
+		Use:   "api <url> [<body>]",
 		Short: "Make an authenticated api.bitbucket.org request to the rest 2.0 api",
-		Long:  "",
+		Long:  "Make an authenticated api.bitbucket.org request to the rest 2.0 api",
 		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println(Headers)
+
 			client := http.Client{}
 
 			url := ""
@@ -42,6 +45,13 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 			req.SetBasicAuth(globalOpts.Username, globalOpts.Password)
+
+			for _, header := range Headers {
+				splitted := strings.SplitN(header, "=", 2)
+				if len(splitted) == 2 {
+					req.Header.Add(splitted[0], splitted[1])
+				}
+			}
 
 			response, err := client.Do(req)
 			if err != nil {
@@ -69,5 +79,6 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	}
 
 	apiCmd.Flags().StringVarP(&Method, "method", "X", "GET", "The HTTP method for the request")
+	apiCmd.Flags().StringArrayVarP(&Headers, "header", "H", []string{}, "Add an additional HTTP request header")
 	rootCmd.AddCommand(apiCmd)
 }
