@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/craftamap/bb/cmd/commands/api"
+	"github.com/craftamap/bb/cmd/commands/downloads"
 	"github.com/craftamap/bb/cmd/commands/pr"
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/kirsle/configdir"
@@ -43,16 +44,13 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/bb)")
 	rootCmd.PersistentFlags().StringVar(&username, "username", "", "username")
 	rootCmd.PersistentFlags().StringVar(&password, "password", "", "app password")
-	rootCmd.PersistentFlags().StringVar(&repoOrga, "repo-orga", "", "repository organisation")
-	rootCmd.PersistentFlags().StringVar(&repoSlug, "repo-slug", "", "repository slug")
 
 	viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
 	viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
-	viper.BindPFlag("repoOrga", rootCmd.PersistentFlags().Lookup("repo-orga"))
-	viper.BindPFlag("repoSlug", rootCmd.PersistentFlags().Lookup("repo-slug"))
 
 	pr.Add(rootCmd, &globalOpts)
 	api.Add(rootCmd, &globalOpts)
+	downloads.Add(rootCmd, &globalOpts)
 }
 
 func initConfig() {
