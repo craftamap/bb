@@ -31,6 +31,7 @@ type PullRequest struct {
 	CommentCount      int             `mapstructure:"comment_count"`
 	CreatedOn         string          `mapstructure:"created_on"`
 	MergeCommit       Commit          `mapstructure:"merge_commit"`
+	Reviewers         []Account       `mapstructure:"reviewers"`
 	Links             map[string]Link `mapstructure:"links"`
 }
 
@@ -189,7 +190,7 @@ func (c Client) PrDefaultBody(repoOrga string, repoSlug string, sourceBranch str
 
 	var sb strings.Builder
 	for _, commit := range commits.Values {
-		sb.WriteString("- " + commit.Message + "\n")
+		sb.WriteString("- " + strings.Split(commit.Message, "\n")[0] + "\n")
 	}
 
 	return sb.String(), nil

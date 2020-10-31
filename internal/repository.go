@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -28,6 +29,14 @@ type Repository struct {
 	// Project     Project         `mapstructure:"project"`
 }
 
+type DefaultReviewers struct {
+	PageLen int        `json:"pagelen"`
+	Values  []*Account `json:"values"`
+	Page    int        `json:"page"`
+	Size    int        `json:"size"`
+	Next    string     `json:"next"`
+}
+
 func (c Client) RepositoryGet(repoOrga string, repoSlug string) (*Repository, error) {
 	client := bitbucket.NewAPIClient(bitbucket.NewConfiguration())
 	response, _, err := client.RepositoriesApi.RepositoriesUsernameRepoSlugGet(
@@ -46,4 +55,24 @@ func (c Client) RepositoryGet(repoOrga string, repoSlug string) (*Repository, er
 		return nil, err
 	}
 	return &repo, nil
+}
+
+func (c Client) GetDefaultReviewers(repoOrga string, repoSlug string) (*DefaultReviewers, error) {
+	client := bitbucket.NewAPIClient(bitbucket.NewConfiguration())
+
+	response, err := client.PullrequestsApi.RepositoriesUsernameRepoSlugDefaultReviewersGet(
+		context.WithValue(context.Background(), bitbucket.ContextBasicAuth, bitbucket.BasicAuth{
+			UserName: c.Username,
+			Password: c.Password,
+		}), repoOrga, repoSlug)
+
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	defaultReviewers := DefaultReviewers{}
+	json.NewDecoder(response.Body).Decode(&defaultReviewers)
+
+	return &defaultReviewers, nil
 }

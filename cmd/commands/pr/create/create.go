@@ -16,6 +16,7 @@ import (
 )
 
 var (
+	Title string
 	Body  string
 	Force bool
 )
@@ -27,13 +28,8 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		Run: func(cmd *cobra.Command, args []string) {
 			var (
 				sourceBranch string
-				targetBranch string
-				title        string
-				defaultBody  string
-				body         string
-				reviewers    []string
 			)
-
+			// Initialisation
 			c := internal.Client{
 				Username: globalOpts.Username,
 				Password: globalOpts.Password,
@@ -49,25 +45,22 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 
+			// Get Current Branch
 			sourceBranch, err = git.CurrentBranch()
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
-			if !Force {
-				possiblePrs, err := c.GetPrIDBySourceBranch(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch)
-				// Note: We want err to be set here, since we don't want an existing pull request
-				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
-					return
-				}
-				if len(possiblePrs.Values) != 0 {
-					id := possiblePrs.Values[0].ID
-					fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), fmt.Sprintf("Pull request %d already exists for this branch. Use --force to ignore this.", id))
-					return
-				}
-			}
 
+			// Prepare required data
+			var (
+				targetBranch string
+				title        string
+				body         string
+				defaultBody  string
+				reviewers    []string
+			)
+			// First, init default data
 			repo, err := c.RepositoryGet(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
@@ -80,31 +73,67 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 
-			fmt.Printf("Creating pull request for %s into %s in %s\n", sourceBranch, targetBranch, fmt.Sprintf("%s/%s", bbrepo.RepoOrga, bbrepo.RepoSlug))
+			title = sourceBranch
+
+			body, err = c.PrDefaultBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
+			defaultBody = body
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				return
+			}
+
+			defaultReviewers, err := c.GetDefaultReviewers(bbrepo.RepoOrga, bbrepo.RepoSlug)
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				return
+			}
+			for _, rev := range defaultReviewers.Values {
+				reviewers = append(reviewers, rev.UUID)
+			}
+
+			// Then, check if a pr is already existing. If force is True, take that data
+			possiblePrs, err := c.GetPrIDBySourceBranch(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch)
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				return
+			}
+
+			if !Force {
+				if len(possiblePrs.Values) != 0 {
+					id := possiblePrs.Values[0].ID
+					fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), fmt.Sprintf("Pull request %d already exists for this branch. Use --force to ignore this.", id))
+					return
+				}
+			} else {
+				if len(possiblePrs.Values) > 0 {
+					existingPr := possiblePrs.Values[0]
+					title = existingPr.Title
+					body = existingPr.Description
+					reviewers = []string{}
+					for _, reviewer := range existingPr.Reviewers {
+						// TODO: make this memory efficient
+						reviewers = append(reviewers, reviewer.UUID)
+					}
+				}
+			}
+			verb := "Creating"
+			if Force {
+				verb = "Re-Creating"
+			}
+
+			fmt.Printf("%s pull request for %s into %s in %s\n", verb, sourceBranch, targetBranch, fmt.Sprintf("%s/%s", bbrepo.RepoOrga, bbrepo.RepoSlug))
 			fmt.Println()
 
-			if title == "" {
+			if Title == "" {
 				questionTitle := &survey.Input{
 					Message: "Title",
-					Default: sourceBranch,
+					Default: title,
 				}
 				err = survey.AskOne(questionTitle, &title)
 			}
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
-			}
-
-			if Body == "" {
-				defaultBody, err = c.PrDefaultBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
-				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
-					return
-				}
-				body = defaultBody
-				fmt.Println(body)
-			} else {
-				body = Body
 			}
 
 			fmt.Println(aurora.Bold(aurora.Green("!").String() + " Body:"))
@@ -173,6 +202,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		},
 	}
 	createCmd.Flags().StringVarP(&Body, "body", "b", "", "Supply a body.")
+	createCmd.Flags().StringVarP(&Title, "title", "t", "", "Supply a title.")
 	createCmd.Flags().BoolVar(&Force, "force", false, "force creation")
 	prCmd.AddCommand(createCmd)
 }
