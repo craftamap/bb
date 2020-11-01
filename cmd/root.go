@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/craftamap/bb/cmd/commands/api"
+	"github.com/craftamap/bb/cmd/commands/auth"
 	"github.com/craftamap/bb/cmd/commands/downloads"
 	"github.com/craftamap/bb/cmd/commands/pr"
 	"github.com/craftamap/bb/cmd/options"
@@ -51,6 +52,7 @@ func init() {
 	pr.Add(rootCmd, &globalOpts)
 	api.Add(rootCmd, &globalOpts)
 	downloads.Add(rootCmd, &globalOpts)
+	auth.Add(rootCmd, &globalOpts)
 }
 
 func initConfig() {
