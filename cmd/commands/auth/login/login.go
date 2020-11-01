@@ -63,6 +63,8 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
+
+			fmt.Println(aurora.Green("::"), "Stored credentials successfully to", viper.ConfigFileUsed())
 		},
 	}
 

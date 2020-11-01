@@ -11,6 +11,7 @@ import (
 	"github.com/craftamap/bb/cmd/commands/pr"
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/kirsle/configdir"
+	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -23,6 +24,14 @@ var (
 		Example: `$ bb pr list`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			viper.Unmarshal(&globalOpts)
+
+			if cmd.Name() != "login" {
+				if globalOpts.Password == "" {
+					fmt.Println(aurora.Yellow("::"), aurora.Bold("Warning:"), "Look's like you have not set up bb yet.")
+					fmt.Println(aurora.Yellow("::"), aurora.Bold("Warning:"), "Run", aurora.BgWhite(aurora.Black(" bb auth login ")), "to set up bb.")
+				}
+			}
+
 		},
 	}
 
