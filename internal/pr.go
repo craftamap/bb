@@ -182,18 +182,32 @@ func (c Client) PrStatuses(repoOrga string, repoSlug string, id string) (*Status
 
 }
 
-func (c Client) PrDefaultBody(repoOrga string, repoSlug string, sourceBranch string, destinationBranch string) (string, error) {
+func (c Client) PrDefaultTitleAndBody(repoOrga string, repoSlug string, sourceBranch string, destinationBranch string) (string, string, error) {
 	commits, err := c.GetCommits(repoOrga, repoSlug, sourceBranch, "", destinationBranch)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
+	if len(commits.Values) == 0 {
+		return sourceBranch, "", nil
+	} else if len(commits.Values) == 1 {
+		commit := commits.Values[0]
 
-	var sb strings.Builder
-	for _, commit := range commits.Values {
-		sb.WriteString("- " + strings.Split(commit.Message, "\n")[0] + "\n")
+		split := strings.SplitN(commit.Message, "\n", 2)
+		if len(split) == 2 {
+			return split[0], split[1], nil
+		} else if len(split) == 1 {
+			return split[0], "", nil
+		}
+
+		return sourceBranch, "", nil
+	} else {
+		var sb strings.Builder
+		for _, commit := range commits.Values {
+			sb.WriteString("- " + strings.Split(commit.Message, "\n")[0] + "\n")
+		}
+
+		return sourceBranch, sb.String(), nil
 	}
-
-	return sb.String(), nil
 }
 
 func (c Client) PrCommits(repoOrga string, repoSlug string, id string) (*Commits, error) {
