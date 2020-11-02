@@ -45,15 +45,11 @@ func Add(downloadsCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 			fmt.Printf("%s Uploading file %s\n", aurora.Green(":: "), filepath.Base(fpath))
 
-			// Workaround: As UploadDownload files currently, we need to recover
-			func() {
-				defer func() {
-					if r := recover(); r != nil {
-						fmt.Println(aurora.Bold("WORKAROUND"), ": Recovered", r)
-					}
-				}()
-				c.UploadDownload(bbrepo.RepoOrga, bbrepo.RepoSlug, fpath)
-			}()
+			_, err = c.UploadDownload(bbrepo.RepoOrga, bbrepo.RepoSlug, fpath)
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				return
+			}
 
 			//if err != nil {
 			//	fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
