@@ -1,6 +1,7 @@
 package downloads
 
 import (
+	"github.com/craftamap/bb/cmd/commands/downloads/download"
 	"github.com/craftamap/bb/cmd/commands/downloads/list"
 	"github.com/craftamap/bb/cmd/commands/downloads/upload"
 	"github.com/craftamap/bb/cmd/options"
@@ -16,6 +17,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 	list.Add(downloadsCmd, globalOpts)
 	upload.Add(downloadsCmd, globalOpts)
+	download.Add(downloadsCmd, globalOpts)
 
 	rootCmd.AddCommand(downloadsCmd)
 }
