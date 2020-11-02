@@ -194,7 +194,7 @@ func (c Client) PrDefaultTitleAndBody(repoOrga string, repoSlug string, sourceBr
 
 		split := strings.SplitN(commit.Message, "\n", 2)
 		if len(split) == 2 {
-			return split[0], split[1], nil
+			return split[0], strings.TrimSpace(split[1]), nil
 		} else if len(split) == 1 {
 			return split[0], "", nil
 		}
