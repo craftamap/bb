@@ -18,15 +18,15 @@ type Commits struct {
 	Values []*Commit `mapstructure:"values"`
 }
 
-func (c Client) GetCommits(repoOrga string, repoSlug string, revision string, include string, exclude string) (*Commits, error) {
+func (c Client) GetCommits(repoOrga string, repoSlug string, branchOrTag string, include string, exclude string) (*Commits, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
 	opts := bitbucket.CommitsOptions{
-		Owner:    repoOrga,
-		RepoSlug: repoSlug,
-		Revision: revision,
-		Exclude:  exclude,
-		Include:  include,
+		Owner:       repoOrga,
+		RepoSlug:    repoSlug,
+		Branchortag: branchOrTag,
+		Exclude:     exclude,
+		Include:     include,
 	}
 
 	var commits Commits
