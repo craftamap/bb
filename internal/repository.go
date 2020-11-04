@@ -72,7 +72,10 @@ func (c Client) GetDefaultReviewers(repoOrga string, repoSlug string) (*DefaultR
 	defer response.Body.Close()
 
 	defaultReviewers := DefaultReviewers{}
-	json.NewDecoder(response.Body).Decode(&defaultReviewers)
+	err = json.NewDecoder(response.Body).Decode(&defaultReviewers)
+	if err != nil {
+		return nil, err
+	}
 
 	return &defaultReviewers, nil
 }

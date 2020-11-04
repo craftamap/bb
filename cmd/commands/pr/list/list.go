@@ -46,7 +46,11 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 				linkWrapper := repo.Links["Html"].(*bitbucket.SubjectTypesRepositoryEvents)
 				link := linkWrapper.Href + "/pull-requests"
-				browser.OpenURL(link)
+				err = browser.OpenURL(link)
+				if err != nil {
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+					return
+				}
 
 				return
 			}

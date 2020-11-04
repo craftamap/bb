@@ -19,7 +19,11 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			if oldPw != "" {
 				fmt.Println(aurora.Yellow("::"), aurora.Bold("Warning:"), "You are already logged in as", viper.GetString("username"))
 				cont := false
-				survey.AskOne(&survey.Confirm{Message: "Do you want to overwrite this?"}, &cont)
+				err := survey.AskOne(&survey.Confirm{Message: "Do you want to overwrite this?"}, &cont)
+				if err != nil {
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+					return
+				}
 
 				if !cont {
 					return

@@ -169,10 +169,14 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				}
 
 				if doNext == "change destination branch" {
-					survey.AskOne(&survey.Input{
+					err := survey.AskOne(&survey.Input{
 						Message: "type your destination branch",
 						Default: targetBranch,
 					}, &targetBranch)
+					if err != nil {
+						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+						return
+					}
 
 					// We need to re-generate the body, if the destination branch is changed
 					// but only if the body was not modified in before

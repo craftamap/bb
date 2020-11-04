@@ -23,7 +23,11 @@ var (
 		Long:    "Work seamlessly with Bitbucket.org from the command line.",
 		Example: `$ bb pr list`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			viper.Unmarshal(&globalOpts)
+			err := viper.Unmarshal(&globalOpts)
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				return
+			}
 
 			if cmd.Name() != "login" {
 				if globalOpts.Password == "" {
@@ -40,8 +44,6 @@ var (
 
 	username string
 	password string
-	repoOrga string
-	repoSlug string
 )
 
 func Execute() error {
@@ -55,8 +57,16 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&username, "username", "", "username")
 	rootCmd.PersistentFlags().StringVar(&password, "password", "", "app password")
 
-	viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
-	viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
+	err := viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
+	if err != nil {
+		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+		return
+	}
+	err = viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
+	if err != nil {
+		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+		return
+	}
 
 	pr.Add(rootCmd, &globalOpts)
 	api.Add(rootCmd, &globalOpts)
