@@ -12,18 +12,28 @@ downloads, and other bitbucket concepts to you the terminal.
 
 # Installation
 
-Currently, the only option to install bb is by compiling it from source.
+## General
 
-Make sure you have a working Go environment. Follow the 
-[Go install instructions](https://golang.org/doc/install).
+Check out the (Releases)[https://github.com/craftamap/bb/releases] page where you
+can find the latest releases built for every environment.
+
+## Arch / AUR
+
+```bash
+yay bbcli-git
+```
 
 ## Using `go get`
+Make sure you have a working Go environment. Follow the 
+[Go install instructions](https://golang.org/doc/install).
 
 ```bash
 go get github.com/craftamap/bb
 ```
 
 ## Building from source
+Make sure you have a working Go environment. Follow the 
+[Go install instructions](https://golang.org/doc/install).
 
 ```bash
 git clone https://github.com/craftamap/bb.git
