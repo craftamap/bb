@@ -6,7 +6,7 @@
 
 `bb` is an inoffical bitbucket.org command line tool deeply inspired by the 
 official [GitHub CLI](https://github.com/cli/cli/). It brings pull requests, 
-downloads, and other bitbucket concepts to you the terminal.
+downloads, and other bitbucket concepts to your terminal.
 
 ![screenshot showing ](.github/screenshot_create_pr.png)
 
