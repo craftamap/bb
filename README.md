@@ -14,7 +14,7 @@ downloads, and other bitbucket concepts to your terminal.
 
 ## General
 
-Check out the (Releases)[https://github.com/craftamap/bb/releases] page where you
+Check out the [Releases](https://github.com/craftamap/bb/releases) page where you
 can find the latest releases built for every environment.
 
 ## Arch / AUR
