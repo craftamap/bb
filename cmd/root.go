@@ -29,7 +29,7 @@ var (
 			password := viper.GetString("password")
 
 			if _, ok := cmd.Annotations["RequiresRepository"]; ok {
-				bbrepo, err := bbgit.GetBitbucketRepo()
+				bbrepo, err := bbgit.GetBitbucketRepo(remoteName)
 				if err != nil {
 					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 					os.Exit(1)
@@ -62,8 +62,9 @@ var (
 	cfgFile    string
 	globalOpts = options.GlobalOptions{}
 
-	username string
-	password string
+	username   string
+	password   string
+	remoteName string
 )
 
 func Execute() error {
@@ -76,6 +77,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/bb)")
 	rootCmd.PersistentFlags().StringVar(&username, "username", "", "username")
 	rootCmd.PersistentFlags().StringVar(&password, "password", "", "app password")
+	rootCmd.PersistentFlags().StringVar(&remoteName, "remote", "origin", "if you are in a repository and don't want to interact with the default origin, you can change it")
 
 	err := viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
 	if err != nil {

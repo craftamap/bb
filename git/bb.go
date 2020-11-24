@@ -1,6 +1,7 @@
 package git
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/cli/cli/git"
@@ -12,30 +13,34 @@ type BitbucketRepo struct {
 	Remote   git.Remote
 }
 
-func GetBitbucketRepo() (*BitbucketRepo, error) {
+func GetBitbucketRepo(remoteName string) (*BitbucketRepo, error) {
 	remotes, err := git.Remotes()
 	if err != nil {
 		return nil, err
 	}
 
-	var origin git.Remote
+	var selectedRemote git.Remote
 	for _, remote := range remotes {
-		if remote.Name == "origin" {
-			origin = *remote
+		if remote.Name == remoteName {
+			selectedRemote = *remote
 		}
 	}
+	// If no selectedRemote is found, throw an error
+	if selectedRemote.Name == "" {
+		return nil, fmt.Errorf("could not find the specified remote %s", remoteName)
+	}
 
-	path := strings.Split(origin.FetchURL.Path, "/")[1:]
+	path := strings.Split(selectedRemote.FetchURL.Path, "/")[1:]
 
 	repoOrga := path[0]
 	repoSlug := path[1]
 
-	if origin.FetchURL.Scheme == "ssh" && strings.HasSuffix(repoSlug, ".git") {
+	if selectedRemote.FetchURL.Scheme == "ssh" && strings.HasSuffix(repoSlug, ".git") {
 		repoSlug = strings.TrimSuffix(repoSlug, ".git")
 	}
 
 	bbrepo := BitbucketRepo{
-		Remote:   origin,
+		Remote:   selectedRemote,
 		RepoOrga: repoOrga,
 		RepoSlug: repoSlug,
 	}
