@@ -9,8 +9,6 @@ import (
 	"github.com/cli/cli/git"
 	"github.com/cli/cli/pkg/surveyext"
 	"github.com/craftamap/bb/cmd/options"
-	bbgit "github.com/craftamap/bb/git"
-	"github.com/craftamap/bb/internal"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
@@ -26,41 +24,31 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	createCmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a pull request",
+		Annotations: map[string]string{
+			"RequiresClient":     "true",
+			"RequiresRepository": "true",
+		},
 		Run: func(cmd *cobra.Command, args []string) {
+			// Initialisation
+
+			c := globalOpts.Client
+			bbrepo := globalOpts.BitbucketRepo
+
 			var (
 				sourceBranch string
-			)
-			// Initialisation
-			c := internal.Client{
-				Username: globalOpts.Username,
-				Password: globalOpts.Password,
-			}
-
-			bbrepo, err := bbgit.GetBitbucketRepo()
-			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
-				return
-			}
-			if !bbrepo.IsBitbucketOrg() {
-				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Are you sure this is a bitbucket repo?")
-				return
-			}
-
-			// Get Current Branch
-			sourceBranch, err = git.CurrentBranch()
-			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
-				return
-			}
-
-			// Prepare required data
-			var (
 				targetBranch string
 				title        string
 				body         string
 				defaultBody  string
 				reviewers    []string
 			)
+			sourceBranch, err := git.CurrentBranch()
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				return
+			}
+
+			// Prepare required data
 			// First, init default data
 			repo, err := c.RepositoryGet(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {

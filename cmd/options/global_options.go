@@ -1,6 +1,11 @@
 package options
 
+import (
+	bbgit "github.com/craftamap/bb/git"
+	"github.com/craftamap/bb/internal"
+)
+
 type GlobalOptions struct {
-	Username string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
+	BitbucketRepo *bbgit.BitbucketRepo
+	Client        *internal.Client
 }

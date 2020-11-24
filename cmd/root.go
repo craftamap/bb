@@ -10,6 +10,8 @@ import (
 	"github.com/craftamap/bb/cmd/commands/downloads"
 	"github.com/craftamap/bb/cmd/commands/pr"
 	"github.com/craftamap/bb/cmd/options"
+	bbgit "github.com/craftamap/bb/git"
+	"github.com/craftamap/bb/internal"
 	"github.com/kirsle/configdir"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
@@ -23,14 +25,32 @@ var (
 		Long:    "Work seamlessly with Bitbucket.org from the command line.",
 		Example: `$ bb pr list`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			err := viper.Unmarshal(&globalOpts)
-			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
-				return
+			username := viper.GetString("username")
+			password := viper.GetString("password")
+
+			if _, ok := cmd.Annotations["RequiresRepository"]; ok {
+				bbrepo, err := bbgit.GetBitbucketRepo()
+				if err != nil {
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+					os.Exit(1)
+				}
+				if !bbrepo.IsBitbucketOrg() {
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), "Are you sure this is a bitbucket repo?")
+					os.Exit(1)
+				}
+
+				globalOpts.BitbucketRepo = bbrepo
+			}
+
+			if _, ok := cmd.Annotations["RequiresClient"]; ok {
+				globalOpts.Client = &internal.Client{
+					Username: username,
+					Password: password,
+				}
 			}
 
 			if cmd.Name() != "login" {
-				if globalOpts.Password == "" {
+				if password == "" {
 					fmt.Println(aurora.Yellow("::"), aurora.Bold("Warning:"), "Look's like you have not set up bb yet.")
 					fmt.Println(aurora.Yellow("::"), aurora.Bold("Warning:"), "Run", aurora.BgWhite(aurora.Black(" bb auth login ")), "to set up bb.")
 				}

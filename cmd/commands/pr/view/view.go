@@ -7,7 +7,6 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/cli/cli/git"
 	"github.com/craftamap/bb/cmd/options"
-	bbgit "github.com/craftamap/bb/git"
 	"github.com/craftamap/bb/internal"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/browser"
@@ -23,24 +22,16 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		Use:   "view",
 		Short: "View a pull request",
 		Long:  "Display the title, body, and other information about a pull request.",
+		Annotations: map[string]string{
+			"RequiresClient":     "true",
+			"RequiresRepository": "true",
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			var id int
 			var err error
-			c := internal.Client{
-				Username: globalOpts.Username,
-				Password: globalOpts.Password,
-			}
 
-			bbrepo, err := bbgit.GetBitbucketRepo()
-
-			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
-				return
-			}
-			if !bbrepo.IsBitbucketOrg() {
-				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Are you sure this is a bitbucket repo?")
-				return
-			}
+			c := globalOpts.Client
+			bbrepo := globalOpts.BitbucketRepo
 
 			if len(args) > 0 {
 				id, err = strconv.Atoi(args[0])

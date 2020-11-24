@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/craftamap/bb/cmd/options"
-	bbgit "github.com/craftamap/bb/git"
-	"github.com/craftamap/bb/internal"
 	"github.com/dustin/go-humanize"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/browser"
@@ -19,21 +17,15 @@ var (
 func Add(downloadsCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	listCmd := &cobra.Command{
 		Use: "list",
+		Annotations: map[string]string{
+			"RequiresClient":     "true",
+			"RequiresRepository": "true",
+		},
 		Run: func(cmd *cobra.Command, args []string) {
-			c := internal.Client{
-				Username: globalOpts.Username,
-				Password: globalOpts.Password,
-			}
 
-			bbrepo, err := bbgit.GetBitbucketRepo()
-			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
-				return
-			}
-			if !bbrepo.IsBitbucketOrg() {
-				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Are you sure this is a bitbucket repo?")
-				return
-			}
+			c := globalOpts.Client
+			bbrepo := globalOpts.BitbucketRepo
+
 			if Web {
 				err := browser.OpenURL(fmt.Sprintf("https://bitbucket.org/%s/%s/downloads", bbrepo.RepoOrga, bbrepo.RepoSlug))
 				if err != nil {

@@ -6,8 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/craftamap/bb/cmd/options"
-	bbgit "github.com/craftamap/bb/git"
-	"github.com/craftamap/bb/internal"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
@@ -15,21 +13,13 @@ import (
 func Add(downloadsCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	uploadCmd := &cobra.Command{
 		Use: "upload",
+		Annotations: map[string]string{
+			"RequiresClient":     "true",
+			"RequiresRepository": "true",
+		},
 		Run: func(cmd *cobra.Command, args []string) {
-			c := internal.Client{
-				Username: globalOpts.Username,
-				Password: globalOpts.Password,
-			}
-
-			bbrepo, err := bbgit.GetBitbucketRepo()
-			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
-				return
-			}
-			if !bbrepo.IsBitbucketOrg() {
-				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Are you sure this is a bitbucket repo?")
-				return
-			}
+			c := globalOpts.Client
+			bbrepo := globalOpts.BitbucketRepo
 
 			if len(args) == 0 {
 				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "No file specified")
@@ -45,7 +35,7 @@ func Add(downloadsCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 			fmt.Printf("%s Uploading file %s\n", aurora.Green(":: "), filepath.Base(fpath))
 
-			_, err = c.UploadDownload(bbrepo.RepoOrga, bbrepo.RepoSlug, fpath)
+			_, err := c.UploadDownload(bbrepo.RepoOrga, bbrepo.RepoSlug, fpath)
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return

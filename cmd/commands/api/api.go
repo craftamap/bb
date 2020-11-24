@@ -23,6 +23,9 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		Use:   "api <url> [<body>]",
 		Short: "Make an authenticated api.bitbucket.org request to the rest 2.0 api",
 		Long:  "Make an authenticated api.bitbucket.org request to the rest 2.0 api",
+		Annotations: map[string]string{
+			"RequiresClient": "true",
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println(Headers)
 
@@ -44,7 +47,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
-			req.SetBasicAuth(globalOpts.Username, globalOpts.Password)
+			req.SetBasicAuth(globalOpts.Client.Username, globalOpts.Client.Username)
 
 			for _, header := range Headers {
 				splitted := strings.SplitN(header, "=", 2)
