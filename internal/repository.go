@@ -1,56 +1,53 @@
 package internal
 
 import (
-	"context"
-	"encoding/json"
-	"time"
-
+	"github.com/ktrysmt/go-bitbucket"
 	"github.com/mitchellh/mapstructure"
-	"github.com/wbrefvem/go-bitbucket"
 )
+
+type Project struct {
+	Key  string
+	Name string
+}
 
 type Repository struct {
 	Links       map[string]interface{} `mapstructure:"Links"`
 	UUID        string                 `mapstructure:"Uuid"`
-	FullName    string                 `mapstructure:"FullName"`
-	IsPrivate   bool                   `mapstructure:"IsPrivate"`
-	Parent      *Repository            `mapstructure:"Parent"`
+	FullName    string                 `mapstructure:"Full_name"`
+	IsPrivate   bool                   `mapstructure:"Is_private"`
 	Owner       *Account               `mapstructure:"Owner"`
 	Name        string                 `mapstructure:"Name"`
 	Description string                 `mapstructure:"Description"`
-	CreatedOn   time.Time              `mapstructure:"CreatedOn"`
-	UpdatedOn   time.Time              `mapstructure:"UpdatedOn"`
 	Size        int                    `mapstructure:"Size"`
 	Language    string                 `mapstructure:"Language"`
-	HasIssues   bool                   `mapstructure:"HasIssues"`
-	HasWiki     bool                   `mapstructure:"HasWiki"`
+	HasIssues   bool                   `mapstructure:"Has_issues"`
 	ForkPolicy  string                 `mapstructure:"ForkPolicy"`
 	MainBranch  *Branch                `mapstructure:"Mainbranch"`
-	// Project     Project         `mapstructure:"project"`
+	Project     Project                `mapstructure:"Project"`
+	// Parent      *Repository            `mapstructure:"Parent"`
+	// CreatedOn   time.Time              `mapstructure:"CreatedOn"`
+	// UpdatedOn   time.Time              `mapstructure:"UpdatedOn"`
 }
 
 type DefaultReviewers struct {
-	PageLen int        `json:"pagelen"`
-	Values  []*Account `json:"values"`
-	Page    int        `json:"page"`
-	Size    int        `json:"size"`
-	Next    string     `json:"next"`
+	Values []*Account `json:"values"`
 }
 
 func (c Client) RepositoryGet(repoOrga string, repoSlug string) (*Repository, error) {
-	client := bitbucket.NewAPIClient(bitbucket.NewConfiguration())
-	response, _, err := client.RepositoriesApi.RepositoriesUsernameRepoSlugGet(
-		context.WithValue(context.Background(), bitbucket.ContextBasicAuth, bitbucket.BasicAuth{
-			UserName: c.Username,
-			Password: c.Password,
-		}), repoOrga, repoSlug)
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
+	opt := &bitbucket.RepositoryOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+	}
+
+	repositoryResponse, err := client.Repositories.Repository.Get(opt)
 	if err != nil {
 		return nil, err
 	}
 
 	var repo Repository
-	err = mapstructure.Decode(response, &repo)
+	err = mapstructure.Decode(repositoryResponse, &repo)
 	if err != nil {
 		return nil, err
 	}
@@ -58,24 +55,22 @@ func (c Client) RepositoryGet(repoOrga string, repoSlug string) (*Repository, er
 }
 
 func (c Client) GetDefaultReviewers(repoOrga string, repoSlug string) (*DefaultReviewers, error) {
-	client := bitbucket.NewAPIClient(bitbucket.NewConfiguration())
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+	opt := &bitbucket.RepositoryOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+	}
 
-	response, err := client.PullrequestsApi.RepositoriesUsernameRepoSlugDefaultReviewersGet(
-		context.WithValue(context.Background(), bitbucket.ContextBasicAuth, bitbucket.BasicAuth{
-			UserName: c.Username,
-			Password: c.Password,
-		}), repoOrga, repoSlug)
-
+	response, err := client.Repositories.Repository.ListDefaultReviewers(opt)
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
 
 	defaultReviewers := DefaultReviewers{}
-	_ = json.NewDecoder(response.Body).Decode(&defaultReviewers)
-	/*if err != nil {
+	err = mapstructure.Decode(response, &defaultReviewers)
+	if err != nil {
 		return nil, err
-	}*/
+	}
 
 	return &defaultReviewers, nil
 }

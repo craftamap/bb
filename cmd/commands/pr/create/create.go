@@ -85,8 +85,17 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
 			}
-			for _, rev := range defaultReviewers.Values {
-				reviewers = append(reviewers, rev.UUID)
+
+			currentUser, err := c.GetCurrentUser()
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Can't get the current user - this means that the default reviewers won't be added to this pull request. Make sure to grant the account-scope for your access token")
+			} else {
+				for _, rev := range defaultReviewers.Values {
+					if currentUser.Uuid != rev.UUID {
+						reviewers = append(reviewers, rev.UUID)
+					}
+				}
+
 			}
 
 			// Then, check if a pr is already existing. If force is True, take that data
