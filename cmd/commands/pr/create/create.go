@@ -16,9 +16,10 @@ import (
 )
 
 var (
-	Title string
-	Body  string
-	Force bool
+	Title       string
+	Body        string
+	Destination string
+	Force       bool
 )
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
@@ -68,6 +69,10 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 			targetBranch = repo.MainBranch.Name
 
+			if Destination != "" {
+				targetBranch = Destination
+			}
+
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
 				return
@@ -114,8 +119,12 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			} else {
 				if len(possiblePrs.Values) > 0 {
 					existingPr := possiblePrs.Values[0]
-					title = existingPr.Title
-					body = existingPr.Description
+					// Only apply the old title if one of the command line options is not set
+					if Title == "" && Body == "" && Destination == "" {
+						title = existingPr.Title
+						body = existingPr.Description
+						targetBranch = existingPr.Destination.Branch.Name
+					}
 					reviewers = []string{}
 					for _, reviewer := range existingPr.Reviewers {
 						// TODO: make this memory efficient
@@ -123,6 +132,16 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					}
 				}
 			}
+
+			// Apply command line args here
+			if Title != "" {
+				title = Title
+			}
+
+			if Body != "" {
+				body = Body
+			}
+
 			verb := "Creating"
 			if Force {
 				verb = "Re-Creating"
@@ -131,6 +150,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			fmt.Printf("%s pull request for %s into %s in %s\n", verb, sourceBranch, targetBranch, fmt.Sprintf("%s/%s", bbrepo.RepoOrga, bbrepo.RepoSlug))
 			fmt.Println()
 
+			// If the title was already specified as command line argument, don't ask for it
 			if Title == "" {
 				questionTitle := &survey.Input{
 					Message: "Title",
@@ -214,6 +234,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	}
 	createCmd.Flags().StringVarP(&Body, "body", "b", "", "Supply a body.")
 	createCmd.Flags().StringVarP(&Title, "title", "t", "", "Supply a title.")
+	createCmd.Flags().StringVarP(&Destination, "destination", "d", "", "Supply the destination branch of your pull request. Defaults to default branch of the repository")
 	createCmd.Flags().BoolVar(&Force, "force", false, "force creation")
 	prCmd.AddCommand(createCmd)
 }
