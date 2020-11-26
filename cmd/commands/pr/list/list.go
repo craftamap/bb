@@ -32,14 +32,14 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			if Web {
 				repo, err := c.RepositoryGet(bbrepo.RepoOrga, bbrepo.RepoSlug)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				}
 
 				linkWrapper := repo.Links["Html"].(*bitbucket.SubjectTypesRepositoryEvents)
 				link := linkWrapper.Href + "/pull-requests"
 				err = browser.OpenURL(link)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 					return
 				}
 
@@ -50,7 +50,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			prs, err := c.PrList(bbrepo.RepoOrga, bbrepo.RepoSlug, []string{state})
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 			}
 
 			fmt.Println()

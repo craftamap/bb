@@ -30,19 +30,19 @@ func Add(downloadsCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			fmt.Println(fpath)
 
 			if _, err := os.Stat(fpath); os.IsNotExist(err) {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 			fmt.Printf("%s Uploading file %s\n", aurora.Green(":: "), filepath.Base(fpath))
 
 			_, err := c.UploadDownload(bbrepo.RepoOrga, bbrepo.RepoSlug, fpath)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
 			//if err != nil {
-			//	fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+			//	fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 			//	return
 			//}
 

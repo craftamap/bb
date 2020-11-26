@@ -32,11 +32,11 @@ var (
 			if _, ok := cmd.Annotations["RequiresRepository"]; ok {
 				bbrepo, err := bbgit.GetBitbucketRepo(remoteName)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 					os.Exit(1)
 				}
 				if !bbrepo.IsBitbucketOrg() {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), "Are you sure this is a bitbucket repo?")
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), "Are you sure this is a bitbucket repo?")
 					os.Exit(1)
 				}
 
@@ -82,12 +82,12 @@ func init() {
 
 	err := viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
 	if err != nil {
-		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 		return
 	}
 	err = viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
 	if err != nil {
-		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 		return
 	}
 

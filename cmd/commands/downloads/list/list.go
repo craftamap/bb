@@ -29,14 +29,14 @@ func Add(downloadsCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			if Web {
 				err := browser.OpenURL(fmt.Sprintf("https://bitbucket.org/%s/%s/downloads", bbrepo.RepoOrga, bbrepo.RepoSlug))
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 					return
 				}
 				return
 			}
 			downloads, err := c.GetDownloads(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 

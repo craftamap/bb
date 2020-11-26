@@ -21,7 +21,7 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				cont := false
 				err := survey.AskOne(&survey.Confirm{Message: "Do you want to overwrite this?"}, &cont)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 					return
 				}
 
@@ -55,7 +55,7 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}, &answers)
 
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
@@ -64,7 +64,7 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			err = viper.WriteConfig()
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 

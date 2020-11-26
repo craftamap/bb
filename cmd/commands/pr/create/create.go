@@ -44,7 +44,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			)
 			sourceBranch, err := git.CurrentBranch()
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
@@ -52,7 +52,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			// First, init default data
 			repo, err := c.RepositoryGet(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 			targetBranch = repo.MainBranch.Name
@@ -62,20 +62,20 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
 			title, body, err = c.PrDefaultTitleAndBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
 			defaultBody = body
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
 			defaultReviewers, err := c.GetDefaultReviewers(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
@@ -94,7 +94,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			// Then, check if a pr is already existing. If force is True, take that data
 			possiblePrs, err := c.GetPrIDBySourceBranch(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
@@ -147,7 +147,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				err = survey.AskOne(questionTitle, &title)
 			}
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
@@ -165,7 +165,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				var doNext string
 				err = survey.AskOne(selectNext, &doNext)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 					return
 				}
 
@@ -178,7 +178,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				if doNext == "modify body" {
 					body, err = surveyext.Edit("vim", "", body, os.Stdin, os.Stdout, os.Stderr, nil)
 					if err != nil {
-						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 						return
 					}
 
@@ -191,7 +191,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 						Default: targetBranch,
 					}, &targetBranch)
 					if err != nil {
-						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 						return
 					}
 
@@ -200,7 +200,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 					_, tempBody, err := c.PrDefaultTitleAndBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
 					if err != nil {
-						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 						return
 					}
 					if body == defaultBody {
@@ -213,7 +213,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			response, err := c.PrCreate(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch, title, body, reviewers)
 			if err != nil {
-				fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 

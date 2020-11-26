@@ -44,7 +44,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			req, err := http.NewRequest(Method, url, bytes.NewBufferString(reqBody))
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 			req.SetBasicAuth(globalOpts.Client.Username, globalOpts.Client.Username)
@@ -58,7 +58,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			response, err := client.Do(req)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
@@ -66,7 +66,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			resBody, err := ioutil.ReadAll(response.Body)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occured: "), err)
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 			if response.StatusCode <= 200 || response.StatusCode > 299 {
