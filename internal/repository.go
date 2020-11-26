@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"strings"
+
 	"github.com/ktrysmt/go-bitbucket"
 	"github.com/mitchellh/mapstructure"
 )
@@ -73,4 +75,43 @@ func (c Client) GetDefaultReviewers(repoOrga string, repoSlug string) (*DefaultR
 	}
 
 	return &defaultReviewers, nil
+}
+
+func (c Client) GetReadmeContent(repoOrga string, repoSlug string, branch string) (string, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	allRootFiles, err := client.Repositories.Repository.ListFiles(&bitbucket.RepositoryFilesOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		Ref:      branch,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	potentialReadmes := []bitbucket.RepositoryFile{}
+
+	for _, rootFile := range allRootFiles {
+		if strings.HasPrefix(strings.ToLower(rootFile.Path), "readme") {
+			potentialReadmes = append(potentialReadmes, rootFile)
+		}
+	}
+
+	if len(potentialReadmes) <= 0 {
+		return "", nil
+	}
+
+	fileName := potentialReadmes[0].Path
+
+	fileBlob, err := client.Repositories.Repository.GetFileBlob(&bitbucket.RepositoryBlobOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		Ref:      branch,
+		Path:     fileName,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return fileBlob.String(), nil
 }
