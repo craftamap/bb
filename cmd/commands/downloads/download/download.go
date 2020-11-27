@@ -2,6 +2,10 @@ package download
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"strings"
 
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/craftamap/bb/internal"
@@ -34,14 +38,45 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 
 			downloadMap := downloadsToMap(downloads)
-
 			dwnld, ok := downloadMap[args[0]]
 			if !ok {
-				fmt.Println("Zu hülfe!!")
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
-			fmt.Println(dwnld.Links)
+			downloadLink := dwnld.Links["self"].Href
+
+			fmt.Printf("%s%s\n", aurora.Green(":: "), fmt.Sprintf("Downloading file from %s", downloadLink))
+
+			req, err := http.NewRequest("GET", downloadLink, strings.NewReader(""))
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				return
+			}
+			req.SetBasicAuth(c.Username, c.Password)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				return
+			}
+			defer resp.Body.Close()
+
+			fmt.Printf("%s%s\n", aurora.Green(":: "), "Downloaded!")
+			fmt.Printf("%s%s\n", aurora.Green(":: "), "Saving file to .")
+
+			out, err := os.Create("./" + args[0])
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				return
+			}
+			defer out.Close()
+
+			_, err = io.Copy(out, resp.Body)
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				return
+			}
+
 		},
 	}
 
@@ -49,10 +84,10 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	prCmd.AddCommand(downloadCmd)
 }
 
-func downloadsToMap(downloads *internal.Downloads) map[string]*internal.Download {
-	downloadMap := map[string]*internal.Download{}
+func downloadsToMap(downloads *internal.Downloads) map[string]internal.Download {
+	downloadMap := map[string]internal.Download{}
 	for _, dwnld := range downloads.Values {
-		downloadMap[dwnld.Name] = &dwnld
+		downloadMap[dwnld.Name] = dwnld
 	}
 	return downloadMap
 }
