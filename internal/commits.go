@@ -40,3 +40,25 @@ func (c Client) GetCommits(repoOrga string, repoSlug string, branchOrTag string,
 	}
 	return &commits, nil
 }
+
+func (c Client) GetCommit(repoOrga string, repoSlug string, rev string) (*Commit, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opts := bitbucket.CommitsOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		Revision: rev,
+	}
+
+	response, err := client.Repositories.Commits.GetCommit(&opts)
+	if err != nil {
+		return nil, err
+	}
+
+	var commit Commit
+	err = mapstructure.Decode(response, &commit)
+	if err != nil {
+		return nil, err
+	}
+	return &commit, nil
+}

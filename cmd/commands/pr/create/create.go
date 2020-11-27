@@ -8,7 +8,9 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/cli/cli/git"
 	"github.com/cli/cli/pkg/surveyext"
+	"github.com/cli/cli/utils"
 	"github.com/craftamap/bb/cmd/options"
+	bbgit "github.com/craftamap/bb/git"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
@@ -64,6 +66,25 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
+			}
+
+			if _, err := c.GetBranch(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch); err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), "This current branch is not available on bitbucket.org yet. You need to push the branch, first.")
+				return
+			}
+
+			head, err := bbgit.CurrentHead()
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				return
+			}
+
+			if _, err := c.GetCommit(bbrepo.RepoOrga, bbrepo.RepoSlug, head); err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Current commit is not available on bitbucket yet. If you create the pull request now, it won't contain the latest pushes.")
+			}
+
+			if ucc, err := git.UncommittedChangeCount(); err == nil && ucc > 0 {
+				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), utils.Pluralize(ucc, "uncommitted change"))
 			}
 
 			title, body, err = c.PrDefaultTitleAndBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)

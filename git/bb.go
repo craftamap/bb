@@ -1,10 +1,12 @@
 package git
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
 	"github.com/cli/cli/git"
+	"github.com/craftamap/bb/internal/run"
 )
 
 type BitbucketRepo struct {
@@ -50,4 +52,19 @@ func GetBitbucketRepo(remoteName string) (*BitbucketRepo, error) {
 
 func (b *BitbucketRepo) IsBitbucketOrg() bool {
 	return strings.Contains(b.Remote.FetchURL.String(), "bitbucket")
+}
+
+func CurrentHead() (string, error) {
+	headCmd, err := git.GitCommand("rev-parse", "HEAD")
+	if err != nil {
+		return "", err
+	}
+	output, err := run.PrepareCmd(headCmd).Output()
+	return firstLine(output), err
+}
+func firstLine(output []byte) string {
+	if i := bytes.IndexAny(output, "\n"); i >= 0 {
+		return string(output)[0:i]
+	}
+	return string(output)
 }
