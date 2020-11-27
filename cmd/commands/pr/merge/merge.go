@@ -64,7 +64,6 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 			view.PrintSummary(pr, commits)
-
 		},
 	}
 

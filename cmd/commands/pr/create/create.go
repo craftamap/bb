@@ -88,7 +88,6 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 						reviewers = append(reviewers, rev.UUID)
 					}
 				}
-
 			}
 
 			// Then, check if a pr is already existing. If force is True, take that data
@@ -206,9 +205,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					if body == defaultBody {
 						body = tempBody
 					}
-
 				}
-
 			}
 
 			response, err := c.PrCreate(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch, title, body, reviewers)

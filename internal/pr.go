@@ -179,7 +179,6 @@ func (c Client) PrStatuses(repoOrga string, repoSlug string, id string) (*Status
 	}
 
 	return &statuses, nil
-
 }
 
 func (c Client) PrDefaultTitleAndBody(repoOrga string, repoSlug string, sourceBranch string, destinationBranch string) (string, string, error) {

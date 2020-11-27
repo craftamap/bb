@@ -55,9 +55,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Nothing on this branch")
 					return
 				}
-
 				id = prs.Values[0].ID
-
 			}
 
 			pr, err := c.PrView(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
@@ -117,6 +115,4 @@ func PrintSummary(pr *internal.PullRequest, commits *internal.Commits) {
 
 	footer := aurora.Index(242, fmt.Sprintf("View this pull request on Bitbucket.org: %s", pr.Links["html"].Href)).String()
 	fmt.Println(footer)
-	// fmt.Println(pr, err)
-
 }

@@ -10,6 +10,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	SUCCESSFUL = "SUCCESSFUL"
+	FAILED     = "FAILED"
+	STOPPED    = "STOPPED"
+	INPROGRESS = "INPROGRESS"
+)
+
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	statusesCmd := &cobra.Command{
 		Use:   "statuses",
@@ -69,18 +76,18 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				)
 
 				for _, status := range statuses.Values {
-					if status.State != "SUCCESSFUL" {
+					if status.State != SUCCESSFUL {
 						allChecksSuccessful = false
 					}
 
 					switch status.State {
-					case "SUCCESSFUL":
+					case SUCCESSFUL:
 						successfulCount++
-					case "FAILED":
+					case FAILED:
 						failedCount++
-					case "INPROGRESS":
+					case INPROGRESS:
 						inProgressCount++
-					case "STOPPED":
+					case STOPPED:
 						stoppedCount++
 					}
 				}
@@ -93,19 +100,17 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				for _, status := range statuses.Values {
 					var statusIcon string
 					switch status.State {
-					case "SUCCESSFUL":
+					case SUCCESSFUL:
 						statusIcon = aurora.Green("✓").String()
-					case "FAILED", "STOPPED":
+					case FAILED, STOPPED:
 						statusIcon = aurora.Red("X").String()
-					case "INPROGRESS":
+					case INPROGRESS:
 						statusIcon = aurora.Yellow("⏱️").String()
 					}
 
 					fmt.Printf("%s %s %s %s\n", statusIcon, aurora.Index(242, status.Type), status.Name, aurora.Index(242, status.URL))
 				}
-
 			}
-
 		},
 	}
 

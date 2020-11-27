@@ -55,7 +55,6 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 	viewCmd.Flags().BoolVar(&Web, "web", false, "view this repository in your web browser")
 	repoCmd.AddCommand(viewCmd)
-
 }
 
 func PrintSummary(repo *internal.Repository, readme string) {
@@ -74,5 +73,4 @@ func PrintSummary(repo *internal.Repository, readme string) {
 	}
 	footer := aurora.Index(242, fmt.Sprintf("View this repository on Bitbucket.org: %s", repo.Links["html"].(map[string]interface{})["href"].(string))).String()
 	fmt.Println(footer)
-
 }
