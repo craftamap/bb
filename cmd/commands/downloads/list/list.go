@@ -22,7 +22,6 @@ func Add(downloadsCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			"RequiresRepository": "true",
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-
 			c := globalOpts.Client
 			bbrepo := globalOpts.BitbucketRepo
 
