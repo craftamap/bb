@@ -11,9 +11,9 @@ type PipelineStateResult struct {
 }
 
 type PipelineState struct {
-	Name  string
-	Type  string
-	state PipelineStateResult
+	Name   string
+	Type   string
+	Result PipelineStateResult
 }
 
 type PipelineTrigger struct {
@@ -23,9 +23,9 @@ type PipelineTrigger struct {
 
 type Pipeline struct {
 	Type              string
-	UUID              string
-	PipelineState     PipelineState
-	BuildNumber       int `mapstructure:"build_number"`
+	UUID              string        `mapstructure:"uuid"`
+	PipelineState     PipelineState `mapstructure:"state"`
+	BuildNumber       int           `mapstructure:"build_number"`
 	Creator           Account
 	CreatedOn         string `mapstructure:"created_on"`
 	CompletedOn       string `mapstructure:"completed_on"`
@@ -44,6 +44,7 @@ func (c Client) PipelineList(repoOrga string, repoSlug string) (*[]Pipeline, err
 	response, err := client.Repositories.Pipelines.List(&bitbucket.PipelinesOptions{
 		Owner:    repoOrga,
 		RepoSlug: repoSlug,
+		Sort:     "-created_on",
 	})
 	if err != nil {
 		return nil, err
