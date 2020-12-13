@@ -22,6 +22,10 @@ var (
 	Force       bool
 )
 
+var (
+	ReviewersNameCache = map[string]string{}
+)
+
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	createCmd := &cobra.Command{
 		Use:   "create",
@@ -108,6 +112,8 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					if currentUser.Uuid != rev.UUID {
 						reviewers = append(reviewers, rev.UUID)
 					}
+					// Add the user to the cache in any case
+					ReviewersNameCache[rev.UUID] = rev.DisplayName
 				}
 			}
 
@@ -175,6 +181,18 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			out, _ := glamour.Render(body, "dark")
 			fmt.Print(out)
+
+			if len(reviewers) > 0 {
+				fmt.Println("Reviewers:")
+				for _, reviewer := range reviewers {
+					name, ok := ReviewersNameCache[reviewer]
+					if ok {
+						fmt.Println("-", name)
+					} else {
+						fmt.Println("-", reviewer)
+					}
+				}
+			}
 
 			for {
 				selectNext := &survey.Select{
