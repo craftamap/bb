@@ -2,6 +2,8 @@ package logs
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/logrusorgru/aurora"
@@ -25,7 +27,12 @@ func Add(pipelinesCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), "Missing argument <number of pipeline>")
 				return
 			}
-			steps, err := c.PipelineStepsList(bbrepo.RepoOrga, bbrepo.RepoSlug, args[0])
+			pipelineID, err := strconv.Atoi(strings.Replace(args[0], "#", "", 1))
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				return
+			}
+			steps, err := c.PipelineStepsList(bbrepo.RepoOrga, bbrepo.RepoSlug, strconv.Itoa(pipelineID))
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
@@ -33,7 +40,7 @@ func Add(pipelinesCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			for _, step := range *steps {
 				fmt.Println(aurora.Green("::"), aurora.Bold("step name:"), step.Name)
-				log, _ := c.PipelinesLogs(bbrepo.RepoOrga, bbrepo.RepoSlug, args[0], step.UUID)
+				log, _ := c.PipelinesLogs(bbrepo.RepoOrga, bbrepo.RepoSlug, strconv.Itoa(pipelineID), step.UUID)
 				fmt.Println(log)
 			}
 		},

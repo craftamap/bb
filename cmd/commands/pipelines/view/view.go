@@ -2,6 +2,7 @@ package view
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/craftamap/bb/cmd/options"
@@ -34,13 +35,19 @@ func Add(pipelinesCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), "Missing argument <number of pipeline>")
 				return
 			}
-			pipeline, err := c.PipelineGet(bbrepo.RepoOrga, bbrepo.RepoSlug, args[0])
+			pipelineID, err := strconv.Atoi(strings.Replace(args[0], "#", "", 1))
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
-			steps, err := c.PipelineStepsList(bbrepo.RepoOrga, bbrepo.RepoSlug, args[0])
+			pipeline, err := c.PipelineGet(bbrepo.RepoOrga, bbrepo.RepoSlug, strconv.Itoa(pipelineID))
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				return
+			}
+
+			steps, err := c.PipelineStepsList(bbrepo.RepoOrga, bbrepo.RepoSlug, strconv.Itoa(pipelineID))
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
