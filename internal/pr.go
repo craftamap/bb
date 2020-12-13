@@ -32,7 +32,17 @@ type PullRequest struct {
 	CreatedOn         string          `mapstructure:"created_on"`
 	MergeCommit       Commit          `mapstructure:"merge_commit"`
 	Reviewers         []Account       `mapstructure:"reviewers"`
+	Participants      []Participant   `mapstructure:"participants"`
 	Links             map[string]Link `mapstructure:"links"`
+}
+
+type Participant struct {
+	Role           string  `mapstructure:"role"`
+	State          string  `mapstructure:"state"`
+	ParticipatedOn string  `mapstructure:"participated_on"`
+	Type           string  `mapstructure:"type"`
+	Approved       bool    `mapstructure:"approved"`
+	User           Account `mapstructure:"user"`
 }
 
 type Resource struct {
