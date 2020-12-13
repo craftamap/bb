@@ -13,14 +13,14 @@ const (
 	SUCCESSFUL = "SUCCESSFUL"
 	FAILED     = "FAILED"
 	STOPPED    = "STOPPED"
-	INPROGRESS = "INPROGRESS"
+	RUNNING    = "RUNNING"
 )
 
 func Add(pipelinesCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	listCmd := &cobra.Command{
 		Use:   "list",
-		Short: "List and filter pull requests in this repository",
-		Long:  "List and filter pull requests in this repository",
+		Short: "List pipeline executions this repository",
+		Long:  "List pipeline executions this repository",
 		Annotations: map[string]string{
 			"RequiresClient":     "true",
 			"RequiresRepository": "true",
@@ -56,7 +56,9 @@ func Add(pipelinesCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					statusIcon = aurora.Green("✓").String()
 				case FAILED, STOPPED:
 					statusIcon = aurora.Red("X").String()
-				case INPROGRESS:
+				}
+				switch pipeline.PipelineState.Stage.Name {
+				case RUNNING:
 					statusIcon = aurora.Yellow("⏱️").String()
 				}
 				revHash := pipeline.Target.(map[string]interface{})["commit"].(map[string]interface{})["hash"].(string)
