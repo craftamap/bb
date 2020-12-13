@@ -97,7 +97,7 @@ func Add(pipelinesCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				case IN_PROGRESS:
 					statusIcon = aurora.Yellow("⏱️")
 				}
-				fmt.Printf("- %s %s\n", statusIcon, step.Name)
+				fmt.Printf("- %s %s (%s)\n", statusIcon, step.Name, step.UUID)
 			}
 		},
 	}

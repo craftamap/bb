@@ -124,3 +124,15 @@ func (c Client) PipelineStepsList(repoOrga string, repoSlug, idOrUuid string) (*
 	}
 	return steps, nil
 }
+
+func (c Client) PipelinesLogs(repoOrga string, repoSlug, idOrUuid string, StepUuid string) (string, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	return client.Repositories.Pipelines.GetLog(&bitbucket.PipelinesOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		IDOrUuid: idOrUuid,
+		StepUuid: StepUuid,
+	})
+
+}
