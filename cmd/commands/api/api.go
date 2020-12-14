@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/craftamap/bb/cmd/options"
@@ -40,6 +41,9 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				reqBody = args[1]
 			}
 
+			fi, _ := os.Stdout.Stat()
+			pipeMode := fi.Mode()&os.ModeCharDevice == 0 // if mode == blockdevice (= piped)
+
 			req, err := http.NewRequest(Method, url, bytes.NewBufferString(reqBody))
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
@@ -66,12 +70,17 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
-			if response.StatusCode <= 200 || response.StatusCode > 299 {
+
+			if !pipeMode {
 				fmt.Printf("%s%s%d\n", aurora.Yellow(":: "), aurora.Bold("Status Code: "), response.StatusCode)
 			}
 
 			if strings.Contains(response.Header["Content-Type"][0], "json") {
-				fmt.Println(string(pretty.Color(pretty.Pretty(resBody), nil)))
+				if pipeMode { // if mode == blockdevice (= piped)
+					fmt.Println(string(pretty.Pretty(resBody)))
+				} else {
+					fmt.Println(string(pretty.Color(pretty.Pretty(resBody), nil)))
+				}
 			} else {
 				fmt.Println(string(resBody))
 			}
