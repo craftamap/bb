@@ -20,7 +20,7 @@ var (
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	viewCmd := &cobra.Command{
-		Use:   "view <nr of pr>",
+		Use:   "view [<nr of pr>]",
 		Short: "View a pull request",
 		Long:  "Display the title, body, and other information about a pull request.",
 		Annotations: map[string]string{

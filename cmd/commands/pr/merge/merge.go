@@ -14,7 +14,7 @@ import (
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	mergeCmd := &cobra.Command{
-		Use:   "merge <number of pr>",
+		Use:   "merge [<number of pr>]",
 		Long:  "Merge a pull request on Bitbucket.org",
 		Short: "Merge a pull request",
 		Annotations: map[string]string{
