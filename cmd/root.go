@@ -8,6 +8,7 @@ import (
 	"github.com/craftamap/bb/cmd/commands/api"
 	"github.com/craftamap/bb/cmd/commands/auth"
 	"github.com/craftamap/bb/cmd/commands/downloads"
+	"github.com/craftamap/bb/cmd/commands/pipelines"
 	"github.com/craftamap/bb/cmd/commands/pr"
 	"github.com/craftamap/bb/cmd/commands/repo"
 	"github.com/craftamap/bb/cmd/options"
@@ -96,6 +97,7 @@ func init() {
 	downloads.Add(rootCmd, &globalOpts)
 	auth.Add(rootCmd, &globalOpts)
 	repo.Add(rootCmd, &globalOpts)
+	pipelines.Add(rootCmd, &globalOpts)
 }
 
 func initConfig() {

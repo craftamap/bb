@@ -45,7 +45,8 @@ go build
 You need to authenticate with your credentials first. You should generate a
 [app password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/)
 for that. Make sure to grant read and write access to the features you want to use.
-(**Recommended**:Repositories: Read/Write, Pull Requests: Read/Write, Pipelines: Read/Write)
+(**Recommended**:Repositories: Read/Write, Pull Requests: Read/Write, 
+Pipelines: Read/Write, Account: Email/Read, Workspace membership: Read/Write)
 
 Run the following command to enter your username and password:
 
@@ -71,9 +72,8 @@ Manage downloads by listing, downloading or uploading them.
 # Development
 ## Used Libraries
 
-We use two multiple different bitbucket libaries:
+We use the following bitbucket libary:
 
- - https://github.com/ktrysmt/go-bitbucket
- - https://github.com/jsdidierlaurent/go-bitbucket 
+ - https://github.com/ktrysmt/go-bitbucket (Apache-2.0 License)
    
-Thanks to both of these!
+Thanks a lot for the work!
