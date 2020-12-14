@@ -3,6 +3,7 @@ package view
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/charmbracelet/glamour"
 	"github.com/cli/cli/git"
@@ -19,7 +20,7 @@ var (
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	viewCmd := &cobra.Command{
-		Use:   "view",
+		Use:   "view <nr of pr>",
 		Short: "View a pull request",
 		Long:  "Display the title, body, and other information about a pull request.",
 		Annotations: map[string]string{
@@ -34,7 +35,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			bbrepo := globalOpts.BitbucketRepo
 
 			if len(args) > 0 {
-				id, err = strconv.Atoi(args[0])
+				id, err = strconv.Atoi(strings.TrimPrefix(args[0], "#"))
 				if err != nil {
 					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 					return
@@ -111,6 +112,24 @@ func PrintSummary(pr *internal.PullRequest, commits *internal.Commits) {
 			return
 		}
 		fmt.Println(out)
+	}
+
+	if len(pr.Participants) > 0 {
+		fmt.Println("Reviewers: ")
+		for _, participant := range pr.Participants {
+			if participant.Role == "REVIEWER" {
+				var state fmt.Stringer
+				switch participant.State {
+				case "":
+					state = aurora.Index(242, "⌛ PENDING ")
+				case "approved":
+					state = aurora.Green("✅ APPROVED")
+				case "changes_requested":
+					state = aurora.Yellow("➖ CHANGE  ")
+				}
+				fmt.Println(state, participant.User.DisplayName)
+			}
+		}
 	}
 
 	footer := aurora.Index(242, fmt.Sprintf("View this pull request on Bitbucket.org: %s", pr.Links["html"].Href)).String()
