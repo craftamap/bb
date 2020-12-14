@@ -27,8 +27,6 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			"RequiresClient": "true",
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(Headers)
-
 			client := http.Client{}
 
 			url := ""
@@ -47,7 +45,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
-			req.SetBasicAuth(globalOpts.Client.Username, globalOpts.Client.Username)
+			req.SetBasicAuth(globalOpts.Client.Username, globalOpts.Client.Password)
 
 			for _, header := range Headers {
 				splitted := strings.SplitN(header, "=", 2)
@@ -55,7 +53,6 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					req.Header.Add(splitted[0], splitted[1])
 				}
 			}
-
 			response, err := client.Do(req)
 			if err != nil {
 				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
