@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/craftamap/bb/cmd/commands/pr/checkout"
+	"github.com/craftamap/bb/cmd/commands/pr/comments"
 	"github.com/craftamap/bb/cmd/commands/pr/create"
 	"github.com/craftamap/bb/cmd/commands/pr/list"
 	"github.com/craftamap/bb/cmd/commands/pr/merge"
@@ -25,6 +26,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	statuses.Add(&prCommand, globalOpts)
 	merge.Add(&prCommand, globalOpts)
 	checkout.Add(&prCommand, globalOpts)
+	comments.Add(&prCommand, globalOpts)
 
 	rootCmd.AddCommand(&prCommand)
 }

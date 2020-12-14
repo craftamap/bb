@@ -74,6 +74,44 @@ type Statuses struct {
 	Values   []Status `mapstructure:"values"`
 }
 
+type CommentContent struct {
+	Type   string `mapstructure:"type"`
+	Raw    string `mapstructure:"raw"`
+	Markup string `mapstructure:"markdown"`
+	HTML   string `mapstructure:"html"`
+}
+
+type CommentParent struct {
+	ID      int                    `mapstructure:"id"`
+	_Links  map[string]interface{} `mapstructure:"links"`
+	Comment *Comment
+}
+
+type CommentInline struct {
+	To   int    `mapstructure:"to"`
+	From int    `mapstructure:"from"`
+	Path string `mapstructure:"path"`
+}
+
+type Comment struct {
+	Links       map[string]interface{} `mapstructure:"links"`
+	Parent      CommentParent          `mapstructure:"parent"`
+	Deleted     bool                   `mapstructure:"deleted"`
+	PullRequest PullRequest            `mapstructure:"pullrequest"`
+	Content     CommentContent         `mapstructure:"content"`
+	CreatedOn   string                 `mapstructure:"created_on"`
+	UpdatedOn   string                 `mapstructure:"updated_on"`
+	User        Account                `mapstructure:"user"`
+	Inline      CommentInline          `mapstructure:"inline"`
+	ID          int                    `mapstructure:"id"`
+	Type        string                 `mapstructure:"type"`
+	Children    []*Comment
+}
+
+type Comments struct {
+	Values []*Comment `mapstructure:"values"`
+}
+
 func (c Client) PrList(repoOrga string, repoSlug string, states []string) (*ListPullRequests, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
@@ -260,4 +298,62 @@ func (c Client) PrMerge(repoOrga string, repoSlug string, id string) (*PullReque
 		return nil, err
 	}
 	return &pullRequest, nil
+}
+
+func (c Client) PrComments(repoOrga string, repoSlug string, id string) (*Comments, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opt := &bitbucket.PullRequestsOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	response, err := client.Repositories.PullRequests.GetComments(opt)
+	if err != nil {
+		return nil, err
+	}
+
+	var comments Comments
+	if err != nil {
+		return nil, err
+	}
+	err = mapstructure.Decode(response, &comments)
+	if err != nil {
+		return nil, err
+	}
+	return &comments, nil
+}
+
+func (c Client) PrThreadedComments(repoOrga string, repoSlug string, id string) ([]*Comment, error) {
+	comments, err := c.PrComments(repoOrga, repoSlug, id)
+	if err != nil {
+		return nil, err
+	}
+
+	idToComment := map[int]*Comment{}
+
+	for _, comment := range comments.Values {
+		idToComment[comment.ID] = comment
+	}
+
+	for _, comment := range idToComment {
+		parentComment := idToComment[comment.Parent.ID]
+		if parentComment != nil {
+			// Set parent in child
+			comment.Parent.Comment = parentComment
+			// Set child in parent
+			parentComment.Children = append(parentComment.Children, comment)
+		}
+	}
+
+	returnArray := []*Comment{}
+
+	for _, comment := range idToComment {
+		if comment.Parent.Comment == nil {
+			returnArray = append(returnArray, comment)
+		}
+	}
+
+	return returnArray, nil
 }

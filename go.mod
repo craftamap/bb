@@ -12,9 +12,12 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
 	github.com/ktrysmt/go-bitbucket v0.9.0
+	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/logrusorgru/aurora/v3 v3.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.3.3
+	github.com/muesli/reflow v0.1.0
+	github.com/pborman/ansi v1.0.0
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
 	github.com/spance/go-callprivate v0.0.0-20151213012958-d8b9b5523668 // indirect
 	github.com/spf13/cobra v1.1.1
