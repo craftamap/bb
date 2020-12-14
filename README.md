@@ -12,20 +12,21 @@ downloads, and other bitbucket concepts to your terminal.
 
 ![screenshot showing ](.github/screenshot_create_pr.png)
 
-# Installation
+## Installation
 
-## General
+### General
 
 Check out the [Releases](https://github.com/craftamap/bb/releases) page where you
-can find the latest releases built for every environment.
+can find the latest releases built for every environment. This includes
+builds for macOS, Windows, Debian, and many more!
 
-## Arch / AUR
+### Arch / AUR
 
 ```bash
 yay bbcli-git
 ```
 
-## Using `go get`
+### Using `go get`
 Make sure you have a working Go environment. Follow the 
 [Go install instructions](https://golang.org/doc/install).
 
@@ -33,7 +34,7 @@ Make sure you have a working Go environment. Follow the
 go get github.com/craftamap/bb
 ```
 
-## Building from source
+### Building from source
 Make sure you have a working Go environment. Follow the 
 [Go install instructions](https://golang.org/doc/install).
 
@@ -42,7 +43,7 @@ git clone https://github.com/craftamap/bb.git
 go build
 ```
 
-# Set-Up
+## Set-Up
 
 You need to authenticate with your credentials first. You should generate a
 [app password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/)
@@ -58,21 +59,41 @@ bb auth login
 
 Your credentials will be stored to `~/.config/bb/configuration.toml`.
 
-# Usage
+## Usage
 
 To see all available commands, use `bb` without any subcommand.
+Many commands support the `--web`-flag to execute the action in the browser, or
+open the browser after performing an specific action.
 
-## Pull Requests
+### Pull Requests
 
-You can use `bb pr` to list, view and merge existing pull requests and see how
-their pipelines run. You can also use `bb pr create` to create new ones.
+You can use `bb pr create` to create new pull requests.
 
-## Downloads
+Also, you can use `bb pr` to list (`bb pr list`), view (`bb pr view`) 
+or merge  existing pull requests (`bb pr merge`) and see how their pipelines 
+ran (`bb pr statuses`). Use `bb pr comments` to see the discussion of a pull 
+request. Use `bb pr checkout` to checkout the branch of a pull request.
 
-Manage downloads by listing, downloading or uploading them.
 
-# Development
-## Used Libraries
+### Downloads
+
+Manage downloads by listing (`bb downloads list`), downloading 
+(`bb downloads <file name>`) or uploading (`br downloads upload`) them.
+
+
+### Pipelines
+
+Check the latest pipeline executions by running `bb pipelines list`. Find out
+more about them by running `bb pipelines view <pipeline id>`, or view their
+logs by running `bb pipelines logs <pipeline id>`.
+
+### Repositories
+
+View basic repository information by running `bb repo view`, or open the 
+repository in the browser by using `bb repo info`.
+
+## Development
+### Used Libraries
 
 We use the following bitbucket libary:
 
