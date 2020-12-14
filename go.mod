@@ -7,6 +7,7 @@ require (
 	github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6 // indirect
 	github.com/charmbracelet/glamour v0.2.1-0.20200724174618-1246d13c1684
 	github.com/cli/cli v1.3.0
+	github.com/cli/safeexec v1.0.0
 	github.com/coreos/etcd v3.3.13+incompatible
 	github.com/dustin/go-humanize v1.0.0
 	github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f

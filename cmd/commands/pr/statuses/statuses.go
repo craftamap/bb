@@ -20,7 +20,7 @@ const (
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	statusesCmd := &cobra.Command{
-		Use:   "statuses <number of pr>",
+		Use:   "statuses [<number of pr>]",
 		Short: "Show CI status for a single pull request",
 		Long:  "Show CI status for a single pull request",
 		Annotations: map[string]string{
