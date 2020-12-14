@@ -3,6 +3,7 @@ package statuses
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/cli/cli/git"
 	"github.com/craftamap/bb/cmd/options"
@@ -19,7 +20,7 @@ const (
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	statusesCmd := &cobra.Command{
-		Use:   "statuses",
+		Use:   "statuses <number of pr>",
 		Short: "Show CI status for a single pull request",
 		Long:  "Show CI status for a single pull request",
 		Annotations: map[string]string{
@@ -34,7 +35,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			bbrepo := globalOpts.BitbucketRepo
 
 			if len(args) > 0 {
-				id, err = strconv.Atoi(args[0])
+				id, err = strconv.Atoi(strings.TrimPrefix(args[0], "#"))
 				if err != nil {
 					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 					return
