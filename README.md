@@ -1,5 +1,7 @@
 # bb
 
+![github versions](https://img.shields.io/github/v/release/craftamap/bb?style=flat-square) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/craftamap/bb/build?style=flat-square) [![Go Report Card](https://goreportcard.com/badge/github.com/craftamap/bb?style=flat-square)](https://goreportcard.com/report/github.com/craftamap/bb)
+
 ![bb logo](.github/bb-logo.png)
 
 ---
