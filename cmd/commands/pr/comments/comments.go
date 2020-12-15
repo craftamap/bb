@@ -73,6 +73,10 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				}
 			}
 
+			for _, comment := range comments {
+				ReviewersNameCache[comment.User.AccountID] = comment.User.DisplayName
+			}
+
 			re := regexp.MustCompile(`@\{([\w\:-]+)\}`)
 			r, _ := glamour.NewTermRenderer(
 				glamour.WithAutoStyle(),
