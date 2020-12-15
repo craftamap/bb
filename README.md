@@ -69,11 +69,14 @@ open the browser after performing an specific action.
 
 You can use `bb pr create` to create new pull requests.
 
+![Create prs within seconds](.github/screencast_pr_create.gif)
+
 Also, you can use `bb pr` to list (`bb pr list`), view (`bb pr view`) 
 or merge  existing pull requests (`bb pr merge`) and see how their pipelines 
 ran (`bb pr statuses`). Use `bb pr comments` to see the discussion of a pull 
 request. Use `bb pr checkout` to checkout the branch of a pull request.
 
+![Manage prs like a ruler](.github/screencast_pr_flow.gif)
 
 ### Downloads
 
