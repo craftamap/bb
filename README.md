@@ -84,16 +84,22 @@ Manage downloads by listing (`bb downloads list`), downloading
 (`bb downloads <file name>`) or uploading (`br downloads upload`) them.
 
 
+![up and down](.github/screencast_downloads_flow.gif)
+
 ### Pipelines
 
 Check the latest pipeline executions by running `bb pipelines list`. Find out
 more about them by running `bb pipelines view <pipeline id>`, or view their
 logs by running `bb pipelines logs <pipeline id>`.
 
+![never gonna give you up](.github/screencast_pipelines_flow.gif)
+
 ### Repositories
 
 View basic repository information by running `bb repo view`, or open the 
-repository in the browser by using `bb repo info`.
+repository in the browser by using `bb repo view --web`.
+
+![A repo in all its beauty](.github/screencast_repo_view.gif)
 
 ## Development
 ### Used Libraries
