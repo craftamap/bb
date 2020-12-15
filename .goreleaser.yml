@@ -21,6 +21,18 @@ archives:
       386: i386
       amd64: x86_64
 
+brews:
+  - goarm: 6
+    tap:
+      owner: craftamap
+      name: homebrew-tap
+    commit_author:
+      name: "Fabian Siegel"
+      email: "fabians1999@gmail.com"
+    homepage: "https://siegelfabian.de/"
+    description: "inoffical Bitbucket.org command line tool "
+    # skip_upload: true
+
 nfpms:
   -
     vendor: craftamap
