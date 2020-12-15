@@ -20,6 +20,13 @@ Check out the [Releases](https://github.com/craftamap/bb/releases) page where yo
 can find the latest releases built for every environment. This includes
 builds for macOS, Windows, Debian, and many more!
 
+
+### macOS
+
+```bash
+brew tap craftamap/tap && brew install bb
+```
+
 ### Arch / AUR
 
 ```bash
