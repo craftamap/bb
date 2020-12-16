@@ -357,3 +357,73 @@ func (c Client) PrThreadedComments(repoOrga string, repoSlug string, id string) 
 
 	return returnArray, nil
 }
+
+func (c Client) PrApprove(repoOrga string, repoSlug string, id string) (*Participant, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opt := &bitbucket.PullRequestsOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	response, err := client.Repositories.PullRequests.Approve(opt)
+	if err != nil {
+		return nil, err
+	}
+
+	var participant Participant
+	err = mapstructure.Decode(response, &participant)
+	if err != nil {
+		return nil, err
+	}
+	return &participant, nil
+}
+
+func (c Client) PrRequestChanges(repoOrga string, repoSlug string, id string) (*Participant, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opt := &bitbucket.PullRequestsOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	response, err := client.Repositories.PullRequests.RequestChanges(opt)
+	if err != nil {
+		return nil, err
+	}
+
+	var participant Participant
+	err = mapstructure.Decode(response, &participant)
+	if err != nil {
+		return nil, err
+	}
+	return &participant, nil
+}
+
+func (c Client) PrUnApprove(repoOrga string, repoSlug string, id string) error {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opt := &bitbucket.PullRequestsOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	_, err := client.Repositories.PullRequests.UnApprove(opt)
+	return err
+}
+
+func (c Client) PrUnRequestChanges(repoOrga string, repoSlug string, id string) error {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opt := &bitbucket.PullRequestsOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	_, err := client.Repositories.PullRequests.UnRequestChanges(opt)
+	return err
+}

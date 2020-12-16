@@ -168,6 +168,8 @@ github.com/ktrysmt/go-bitbucket v0.8.0 h1:KwJcRTtGhiHezFQgdFrMOV/r9rVyuFk/KYZftg
 github.com/ktrysmt/go-bitbucket v0.8.0/go.mod h1:9u0v3hsd2rqCHRIpbir1oP7F58uo5dq19sBYvuMoyQ4=
 github.com/ktrysmt/go-bitbucket v0.9.0 h1:T/8UBpQZ67atGa3hnESlWidQ0n9MpsqfKxPNe4sCOMQ=
 github.com/ktrysmt/go-bitbucket v0.9.0/go.mod h1:9u0v3hsd2rqCHRIpbir1oP7F58uo5dq19sBYvuMoyQ4=
+github.com/ktrysmt/go-bitbucket v0.9.2 h1:HpfQEGPqyvdxYamryObQHm82okwVi1iDTDETVZxBAJE=
+github.com/ktrysmt/go-bitbucket v0.9.2/go.mod h1:9u0v3hsd2rqCHRIpbir1oP7F58uo5dq19sBYvuMoyQ4=
 github.com/kyokomi/emoji v1.5.1 h1:qp9dub1mW7C4MlvoRENH6EAENb9skEFOvIEbp1Waj38=
 github.com/kyokomi/emoji v2.2.4+incompatible h1:np0woGKwx9LiHAQmwZx79Oc0rHpNw3o+3evou4BEPv4=
 github.com/kyokomi/emoji v2.2.4+incompatible/go.mod h1:mZ6aGCD7yk8j6QY6KICwnZ2pxoszVseX1DNoGtU2tBA=
