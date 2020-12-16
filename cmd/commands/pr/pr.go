@@ -7,6 +7,7 @@ import (
 	"github.com/craftamap/bb/cmd/commands/pr/checkout"
 	"github.com/craftamap/bb/cmd/commands/pr/comments"
 	"github.com/craftamap/bb/cmd/commands/pr/create"
+	"github.com/craftamap/bb/cmd/commands/pr/diff"
 	"github.com/craftamap/bb/cmd/commands/pr/list"
 	"github.com/craftamap/bb/cmd/commands/pr/merge"
 	"github.com/craftamap/bb/cmd/commands/pr/requestchanges"
@@ -31,6 +32,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	comments.Add(&prCommand, globalOpts)
 	approve.Add(&prCommand, globalOpts)
 	requestchanges.Add(&prCommand, globalOpts)
+	diff.Add(&prCommand, globalOpts)
 
 	rootCmd.AddCommand(&prCommand)
 }
