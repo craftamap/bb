@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"github.com/craftamap/bb/cmd/commands/repo/clone"
 	"github.com/craftamap/bb/cmd/commands/repo/view"
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/spf13/cobra"
@@ -14,6 +15,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	}
 
 	view.Add(&repoCommand, globalOpts)
+	clone.Add(&repoCommand, globalOpts)
 
 	rootCmd.AddCommand(&repoCommand)
 }

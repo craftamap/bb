@@ -35,6 +35,26 @@ type DefaultReviewers struct {
 	Values []*Account `json:"values"`
 }
 
+func (c Client) RepositoriesForWorkspace(repoOrga string) ([]Repository, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opt := &bitbucket.RepositoriesOptions{
+		Owner: repoOrga,
+	}
+
+	repositoriesResponse, err := client.Repositories.ListForAccount(opt)
+	if err != nil {
+		return nil, err
+	}
+
+	var repos []Repository
+	err = mapstructure.Decode(repositoriesResponse.Items, &repos)
+	if err != nil {
+		return nil, err
+	}
+	return repos, nil
+}
+
 func (c Client) RepositoryGet(repoOrga string, repoSlug string) (*Repository, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
