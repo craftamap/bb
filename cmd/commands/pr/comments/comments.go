@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/cli/cli/git"
 	"github.com/craftamap/bb/cmd/options"
-	"github.com/craftamap/bb/internal"
+	"github.com/craftamap/bb/client"
 	"github.com/kyokomi/emoji"
 	"github.com/logrusorgru/aurora"
 	"github.com/muesli/reflow/wordwrap"
@@ -83,8 +83,8 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				glamour.WithWordWrap(-1),
 			)
 
-			var recursiveComments func(*internal.Comment, int)
-			recursiveComments = func(comment *internal.Comment, depth int) {
+			var recursiveComments func(*client.Comment, int)
+			recursiveComments = func(comment *client.Comment, depth int) {
 				prefix := strings.Repeat(" ", depth) + aurora.Blue("│").String()
 
 				fmt.Println(prefix)

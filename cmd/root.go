@@ -13,7 +13,7 @@ import (
 	"github.com/craftamap/bb/cmd/commands/repo"
 	"github.com/craftamap/bb/cmd/options"
 	bbgit "github.com/craftamap/bb/git"
-	"github.com/craftamap/bb/internal"
+	"github.com/craftamap/bb/client"
 	"github.com/kirsle/configdir"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
@@ -45,7 +45,7 @@ var (
 			}
 
 			if _, ok := cmd.Annotations["RequiresClient"]; ok {
-				globalOpts.Client = &internal.Client{
+				globalOpts.Client = &client.Client{
 					Username: username,
 					Password: password,
 				}

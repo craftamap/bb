@@ -1,4 +1,4 @@
-package internal
+package client
 
 type Client struct {
 	Username string

@@ -1,4 +1,4 @@
-package internal
+package client
 
 import "github.com/ktrysmt/go-bitbucket"
 

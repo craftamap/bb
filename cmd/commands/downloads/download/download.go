@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/craftamap/bb/cmd/options"
-	"github.com/craftamap/bb/internal"
+	"github.com/craftamap/bb/client"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
@@ -141,8 +141,8 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	prCmd.AddCommand(downloadCmd)
 }
 
-func downloadsToMap(downloads *internal.Downloads) map[string]internal.Download {
-	downloadMap := map[string]internal.Download{}
+func downloadsToMap(downloads *client.Downloads) map[string]client.Download {
+	downloadMap := map[string]client.Download{}
 	for _, dwnld := range downloads.Values {
 		downloadMap[dwnld.Name] = dwnld
 	}

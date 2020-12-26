@@ -8,7 +8,7 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/cli/cli/git"
 	"github.com/craftamap/bb/cmd/options"
-	"github.com/craftamap/bb/internal"
+	"github.com/craftamap/bb/client"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
@@ -86,7 +86,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	prCmd.AddCommand(viewCmd)
 }
 
-func PrintSummary(pr *internal.PullRequest, commits *internal.Commits) {
+func PrintSummary(pr *client.PullRequest, commits *client.Commits) {
 	fmt.Println(aurora.Bold(pr.Title))
 	var state string
 	if pr.State == "OPEN" {

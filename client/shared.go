@@ -1,4 +1,4 @@
-package internal
+package client
 
 type Link struct {
 	Href string `mapstructure:"href"`

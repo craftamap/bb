@@ -2,10 +2,10 @@ package options
 
 import (
 	bbgit "github.com/craftamap/bb/git"
-	"github.com/craftamap/bb/internal"
+	"github.com/craftamap/bb/client"
 )
 
 type GlobalOptions struct {
 	BitbucketRepo *bbgit.BitbucketRepo
-	Client        *internal.Client
+	Client        *client.Client
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/charmbracelet/glamour"
 	"github.com/craftamap/bb/cmd/options"
-	"github.com/craftamap/bb/internal"
+	"github.com/craftamap/bb/client"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
@@ -57,7 +57,7 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	repoCmd.AddCommand(viewCmd)
 }
 
-func PrintSummary(repo *internal.Repository, readme string) {
+func PrintSummary(repo *client.Repository, readme string) {
 	fmt.Println(aurora.Bold(repo.FullName))
 	if repo.Description != "" {
 		fmt.Println(aurora.Bold("Description:"), repo.Description)
