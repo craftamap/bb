@@ -2,6 +2,8 @@ package create
 
 import (
 	"fmt"
+	"github.com/craftamap/bb/client"
+	"github.com/ktrysmt/go-bitbucket"
 	"os"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -65,11 +67,6 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			if Destination != "" {
 				targetBranch = Destination
-			}
-
-			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
-				return
 			}
 
 			if _, err := c.GetBranch(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch); err != nil {
@@ -224,159 +221,35 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				}
 
 				if doNext == "modify title" {
-					questionTitle := &survey.Input{
-						Message: "Title",
-						Default: title,
-					}
-					err = survey.AskOne(questionTitle, &title)
-					if err != nil {
-						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
-						return
-					}
-					fmt.Println(aurora.Bold(aurora.Green("!").String()+" Title:"), title)
-					continue
-				}
-
-				if doNext == "modify body" {
-					body, err = surveyext.Edit("vim", "", body, os.Stdin, os.Stdout, os.Stderr, nil)
+					title, err = modifyTitle(title)
 					if err != nil {
 						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 						return
 					}
+					continue
+				}
 
-					fmt.Println(aurora.Bold(aurora.Green("!").String() + " Body:"))
-
-					out, _ := glamour.Render(body, "dark")
-					fmt.Print(out)
+				if doNext == "modify body" {
+					body, err = modifyBody(body)
+					if err != nil {
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						return
+					}
 					continue
 				}
 
 				if doNext == "change destination branch" {
-					err := survey.AskOne(&survey.Input{
-						Message: "type your destination branch",
-						Default: targetBranch,
-					}, &targetBranch)
+					body, err = changeDestinationBranch(bbrepo, c, targetBranch, sourceBranch, body, defaultBody)
 					if err != nil {
-						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 						return
-					}
-
-					// We need to re-generate the body, if the destination branch is changed
-					// but only if the body was not modified in before
-
-					_, tempBody, err := c.PrDefaultTitleAndBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
-					if err != nil {
-						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
-						return
-					}
-					if body == defaultBody {
-						body = tempBody
 					}
 				}
 				if doNext == "manage reviewers" {
-					if currentUser == nil {
-						fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Can't get the current user - this means that reviewers can't be managed on this pull request. Make sure to grant the account-scope for your access token.")
-					}
-					for {
-						fmt.Println("Reviewers:")
-						if len(reviewers) == 0 {
-							fmt.Println("None")
-						} else {
-							for _, reviewer := range reviewers {
-
-								name, ok := ReviewersNameCache[reviewer]
-								if ok {
-									fmt.Println("-", name)
-								} else {
-									fmt.Println("-", reviewer)
-								}
-							}
-						}
-						var answer string
-						err := survey.AskOne(&survey.Select{
-							Message: "What do you want to do?",
-							Options: []string{"add reviewer", "remove reviewer", "go back"},
-						}, &answer)
-						if err != nil {
-							fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
-							return
-						}
-
-						if answer == "go back" {
-							break
-						}
-
-						if answer == "remove reviewer" {
-							nameToUUID := map[string]string{}
-							listOfNames := make([]string, 0, len(reviewers))
-							for _, rev := range reviewers {
-								name := ReviewersNameCache[rev]
-								listOfNames = append(listOfNames, name)
-								nameToUUID[name] = rev
-							}
-							if len(listOfNames) == 0 {
-								fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "No reviwers to remove available")
-								continue
-							}
-							var removedReviewers []string
-							err := survey.AskOne(&survey.MultiSelect{
-								Message:  "Which reviewer do you want to remove?",
-								Options:  listOfNames,
-								PageSize: 20,
-							}, &removedReviewers)
-							if err != nil {
-								fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
-								return
-							}
-							for _, removedReviewer := range removedReviewers {
-								uuid := nameToUUID[removedReviewer]
-								reviewers = removeFromList(reviewers, uuid)
-							}
-						}
-
-						if answer == "add reviewer" {
-							fmt.Printf("%s%s%s\n", aurora.Magenta(":: "), aurora.Bold("Note: "), "Currently, only members of the current workspace can be added as reviewers.")
-							fmt.Printf("%s%s%s\n", aurora.Magenta(":: "), aurora.Bold("Note: "), "Currently, there is no way of detecting if a user of your workspace has access to the repository. Adding a wrong user without access to the repository leads to a error while creating the repository.")
-
-							members, err := c.GetWorkspaceMembers(bbrepo.RepoOrga)
-							if err != nil {
-								fmt.Printf("%s%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Could not get workspace members - create the pr without reviewers and add them manually using the browser", err)
-								continue
-							}
-							nonReviewersMembers := []string{}
-							for _, member := range members.Values {
-								ReviewersNameCache[member.UUID] = member.DisplayName
-								if !stringInSlice(member.UUID, reviewers) && member.UUID != currentUser.Uuid {
-									nonReviewersMembers = append(nonReviewersMembers, member.UUID)
-								}
-							}
-							nameToUUID := map[string]string{}
-							listOfNames := make([]string, 0, len(nonReviewersMembers))
-							for _, rev := range nonReviewersMembers {
-								name := ReviewersNameCache[rev]
-								listOfNames = append(listOfNames, name)
-								nameToUUID[name] = rev
-							}
-							if len(listOfNames) == 0 {
-								fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "No reviwers to add available")
-								continue
-							}
-							var addedReviewers []string
-							err = survey.AskOne(&survey.MultiSelect{
-								Message:  "Which reviewer do you want to add?",
-								Options:  listOfNames,
-								PageSize: 20,
-							}, &addedReviewers)
-							if err != nil {
-								fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
-								return
-							}
-							for _, addedReviewer := range addedReviewers {
-								uuid := nameToUUID[addedReviewer]
-								reviewers = append(reviewers, uuid)
-							}
-						}
-
+					reviewers, err = manageReviewers(bbrepo, c, currentUser, reviewers)
+					if err != nil {
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						return
 					}
 				}
 			}
@@ -395,6 +268,161 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	createCmd.Flags().StringVarP(&Destination, "destination", "d", "", "Supply the destination branch of your pull request. Defaults to default branch of the repository")
 	createCmd.Flags().BoolVar(&Force, "force", false, "force creation")
 	prCmd.AddCommand(createCmd)
+}
+
+func modifyBody(body string) (string, error) {
+	body, err := surveyext.Edit("vim", "", body, os.Stdin, os.Stdout, os.Stderr, nil)
+	if err != nil {
+		return "",  err
+	}
+
+	fmt.Println(aurora.Bold(aurora.Green("!").String() + " Body:"))
+
+	out, _ := glamour.Render(body, "dark")
+	fmt.Print(out)
+	return body, nil
+}
+
+func modifyTitle(title string) (string, error) {
+	questionTitle := &survey.Input{
+		Message: "Title",
+		Default: title,
+	}
+	err := survey.AskOne(questionTitle, &title)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(aurora.Bold(aurora.Green("!").String()+" Title:"), title)
+	return title, nil
+}
+
+func changeDestinationBranch(bbrepo *bbgit.BitbucketRepo, c *client.Client, targetBranch string, sourceBranch string, body string, defaultBody string) (string, error) {
+	err := survey.AskOne(&survey.Input{
+		Message: "type your destination branch",
+		Default: targetBranch,
+	}, &targetBranch)
+	if err != nil {
+		return "", err
+	}
+
+	// We need to re-generate the body, if the destination branch is changed
+	// but only if the body was not modified in before
+
+	_, tempBody, err := c.PrDefaultTitleAndBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
+	if err != nil {
+		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+		return "", err
+	}
+	if body == defaultBody {
+		body = tempBody
+	}
+	return body, nil
+}
+
+func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser *bitbucket.User, reviewers []string) ([]string, error) {
+	if currentUser == nil {
+		fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Can't get the current user - this means that reviewers can't be managed on this pull request. Make sure to grant the account-scope for your access token.")
+	}
+	for {
+		fmt.Println("Reviewers:")
+		if len(reviewers) == 0 {
+			fmt.Println("None")
+		} else {
+			for _, reviewer := range reviewers {
+
+				name, ok := ReviewersNameCache[reviewer]
+				if ok {
+					fmt.Println("-", name)
+				} else {
+					fmt.Println("-", reviewer)
+				}
+			}
+		}
+		var answer string
+		err := survey.AskOne(&survey.Select{
+			Message: "What do you want to do?",
+			Options: []string{"add reviewer", "remove reviewer", "go back"},
+		}, &answer)
+		if err != nil {
+			return nil, err
+		}
+
+		if answer == "go back" {
+			break
+		}
+
+		if answer == "remove reviewer" {
+			nameToUUID := map[string]string{}
+			listOfNames := make([]string, 0, len(reviewers))
+			for _, rev := range reviewers {
+				name := ReviewersNameCache[rev]
+				listOfNames = append(listOfNames, name)
+				nameToUUID[name] = rev
+			}
+			if len(listOfNames) == 0 {
+				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "No reviwers to remove available")
+				continue
+			}
+			var removedReviewers []string
+			err := survey.AskOne(&survey.MultiSelect{
+				Message:  "Which reviewer do you want to remove?",
+				Options:  listOfNames,
+				PageSize: 20,
+			}, &removedReviewers)
+			if err != nil {
+				return nil, err
+			}
+			for _, removedReviewer := range removedReviewers {
+				uuid := nameToUUID[removedReviewer]
+				reviewers = removeFromList(reviewers, uuid)
+			}
+		}
+
+		if answer == "add reviewer" {
+			fmt.Printf("%s%s%s\n", aurora.Magenta(":: "), aurora.Bold("Note: "), "Currently, only members of the current workspace can be added as reviewers.")
+			fmt.Printf("%s%s%s\n", aurora.Magenta(":: "), aurora.Bold("Note: "), "Currently, there is no way of detecting if a user of your workspace has access to the repository. Adding a wrong user without access to the repository leads to a error while creating the repository.")
+
+			members, err := c.GetWorkspaceMembers(bbrepo.RepoOrga)
+			if err != nil {
+				fmt.Printf("%s%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Could not get workspace members - create the pr without reviewers and add them manually using the browser", err)
+				continue
+			}
+			var nonReviewersMembers []string
+			for _, member := range members.Values {
+				ReviewersNameCache[member.UUID] = member.DisplayName
+				if !stringInSlice(member.UUID, reviewers) && member.UUID != currentUser.Uuid {
+					nonReviewersMembers = append(nonReviewersMembers, member.UUID)
+				}
+			}
+			nameToUUID := map[string]string{}
+			listOfNames := make([]string, 0, len(nonReviewersMembers))
+			for _, rev := range nonReviewersMembers {
+				name := ReviewersNameCache[rev]
+				listOfNames = append(listOfNames, name)
+				nameToUUID[name] = rev
+			}
+			if len(listOfNames) == 0 {
+				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "No reviwers to add available")
+				continue
+			}
+			var addedReviewers []string
+			err = survey.AskOne(&survey.MultiSelect{
+				Message:  "Which reviewer do you want to add?",
+				Options:  listOfNames,
+				PageSize: 20,
+			}, &addedReviewers)
+			if err != nil {
+				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				return nil, err
+			}
+			for _, addedReviewer := range addedReviewers {
+				uuid := nameToUUID[addedReviewer]
+				reviewers = append(reviewers, uuid)
+			}
+		}
+
+	}
+	return reviewers, nil
 }
 
 func removeFromList(list []string, element string) []string {
