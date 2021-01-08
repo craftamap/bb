@@ -13,6 +13,8 @@ builds:
       - linux
       - windows
       - darwin
+    ldflags: -s -w -X github.com/craftamap/bb/cmd.Version={{ .Version }} -X github.com/craftamap/bb/cmd.CommitSHA={{ .Commit }}
+
 archives:
   - replacements:
       darwin: Darwin
