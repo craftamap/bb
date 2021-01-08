@@ -201,7 +201,12 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				selectNext := &survey.Select{
 					Message: "What's next?",
 					Options: []string{
-						"create", "modify body", "change destination branch", "manage reviewers", "cancel",
+						"create",
+						"modify title",
+						"modify body",
+						"change destination branch",
+						"manage reviewers",
+						"cancel",
 					},
 					Default: "create",
 				}
@@ -216,6 +221,20 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					return
 				} else if doNext == "create" {
 					break
+				}
+
+				if doNext == "modify title" {
+					questionTitle := &survey.Input{
+						Message: "Title",
+						Default: title,
+					}
+					err = survey.AskOne(questionTitle, &title)
+					if err != nil {
+						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						return
+					}
+					fmt.Println(aurora.Bold(aurora.Green("!").String()+" Title:"), title)
+					continue
 				}
 
 				if doNext == "modify body" {
