@@ -2,6 +2,7 @@ package view
 
 import (
 	"fmt"
+	"github.com/craftamap/bb/util/logging"
 	"strconv"
 	"strings"
 
@@ -37,23 +38,23 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			if len(args) > 0 {
 				id, err = strconv.Atoi(strings.TrimPrefix(args[0], "#"))
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 			} else {
 				branchName, err := git.CurrentBranch()
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 
 				prs, err := c.GetPrIDBySourceBranch(bbrepo.RepoOrga, bbrepo.RepoSlug, branchName)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 				if len(prs.Values) == 0 {
-					fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Nothing on this branch")
+					logging.Warning("Nothing on this branch")
 					return
 				}
 				id = prs.Values[0].ID
@@ -61,13 +62,13 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			pr, err := c.PrView(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 			if Web {
 				err := browser.OpenURL(pr.Links["html"].Href)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 				return
@@ -75,7 +76,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			commits, err := c.PrCommits(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
@@ -108,7 +109,7 @@ func PrintSummary(pr *client.PullRequest, commits *client.Commits) {
 	if pr.Description != "" {
 		out, err := glamour.Render(pr.Description, "dark")
 		if err != nil {
-			fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+			logging.Error(err)
 			return
 		}
 		fmt.Println(out)

@@ -2,6 +2,7 @@ package checkout
 
 import (
 	"fmt"
+	"github.com/craftamap/bb/util/logging"
 	"os"
 	"os/exec"
 	"strconv"
@@ -11,7 +12,6 @@ import (
 	"github.com/cli/safeexec"
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/craftamap/bb/internal/run"
-	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +34,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			if len(args) > 0 {
 				id, err = strconv.Atoi(strings.TrimPrefix(args[0], "#"))
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 			} else {
@@ -42,7 +42,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 			pr, err := c.PrView(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
@@ -65,14 +65,14 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				exe, err := safeexec.LookPath(args[0])
 
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 				cmd := exec.Command(exe, args[1:]...)
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
 				if err := run.PrepareCmd(cmd).Run(); err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 			}

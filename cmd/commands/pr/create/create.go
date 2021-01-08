@@ -3,6 +3,7 @@ package create
 import (
 	"fmt"
 	"github.com/craftamap/bb/client"
+	"github.com/craftamap/bb/util/logging"
 	"github.com/ktrysmt/go-bitbucket"
 	"os"
 
@@ -52,7 +53,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			)
 			sourceBranch, err := git.CurrentBranch()
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
@@ -60,7 +61,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			// First, init default data
 			repo, err := c.RepositoryGet(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 			targetBranch = repo.MainBranch.Name
@@ -76,34 +77,34 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			head, err := bbgit.CurrentHead()
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
 			if _, err := c.GetCommit(bbrepo.RepoOrga, bbrepo.RepoSlug, head); err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Current commit is not available on bitbucket yet. If you create the pull request now, it won't contain the latest pushes.")
+				logging.Warning("Current commit is not available on bitbucket yet. If you create the pull request now, it won't contain the latest pushes.")
 			}
 
 			if ucc, err := git.UncommittedChangeCount(); err == nil && ucc > 0 {
-				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), utils.Pluralize(ucc, "uncommitted change"))
+				logging.Warning(utils.Pluralize(ucc, "uncommitted change"))
 			}
 
 			title, body, err = c.PrDefaultTitleAndBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
 			defaultBody = body
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
 			defaultReviewers, err := c.GetDefaultReviewers(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
 			currentUser, err := c.GetCurrentUser()
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Can't get the current user - this means that the default reviewers won't be added to this pull request. Make sure to grant the account-scope for your access token")
+				logging.Warning("Can't get the current user - this means that the default reviewers won't be added to this pull request. Make sure to grant the account-scope for your access token")
 			} else {
 				for _, rev := range defaultReviewers.Values {
 					if currentUser.Uuid != rev.UUID {
@@ -117,14 +118,14 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			// Then, check if a pr is already existing. If force is True, take that data
 			possiblePrs, err := c.GetPrIDBySourceBranch(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
 			if !Force {
 				if len(possiblePrs.Values) != 0 {
 					id := possiblePrs.Values[0].ID
-					fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), fmt.Sprintf("Pull request %d already exists for this branch. Use --force to ignore this.", id))
+					logging.Warning(fmt.Sprintf("Pull request %d already exists for this branch. Use --force to ignore this.", id))
 					return
 				}
 			} else {
@@ -170,11 +171,11 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				err = survey.AskOne(questionTitle, &title)
 			}
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
-			fmt.Println(aurora.Bold(aurora.Green("!").String() + " Body:"))
+			logging.SuccessExclamation("Body:")
 
 			out, _ := glamour.Render(body, "dark")
 			fmt.Print(out)
@@ -210,7 +211,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				var doNext string
 				err = survey.AskOne(selectNext, &doNext)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 
@@ -310,7 +311,7 @@ func changeDestinationBranch(bbrepo *bbgit.BitbucketRepo, c *client.Client, targ
 
 	_, tempBody, err := c.PrDefaultTitleAndBody(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch)
 	if err != nil {
-		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+		logging.Error(err)
 		return "", err
 	}
 	if body == defaultBody {
@@ -321,7 +322,7 @@ func changeDestinationBranch(bbrepo *bbgit.BitbucketRepo, c *client.Client, targ
 
 func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser *bitbucket.User, reviewers []string) ([]string, error) {
 	if currentUser == nil {
-		fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Can't get the current user - this means that reviewers can't be managed on this pull request. Make sure to grant the account-scope for your access token.")
+		logging.Warning("Can't get the current user - this means that reviewers can't be managed on this pull request. Make sure to grant the account-scope for your access token.")
 	}
 	for {
 		fmt.Println("Reviewers:")
@@ -360,7 +361,7 @@ func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser 
 				nameToUUID[name] = rev
 			}
 			if len(listOfNames) == 0 {
-				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "No reviwers to remove available")
+				logging.Warning("No reviwers to remove available")
 				continue
 			}
 			var removedReviewers []string
@@ -384,7 +385,7 @@ func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser 
 
 			members, err := c.GetWorkspaceMembers(bbrepo.RepoOrga)
 			if err != nil {
-				fmt.Printf("%s%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "Could not get workspace members - create the pr without reviewers and add them manually using the browser", err)
+				logging.Warning(fmt.Sprint("Could not get workspace members - create the pr without reviewers and add them manually using the browser", err))
 				continue
 			}
 			var nonReviewersMembers []string
@@ -402,7 +403,7 @@ func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser 
 				nameToUUID[name] = rev
 			}
 			if len(listOfNames) == 0 {
-				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "No reviwers to add available")
+				logging.Warning("No reviwers to add available")
 				continue
 			}
 			var addedReviewers []string
@@ -412,7 +413,7 @@ func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser 
 				PageSize: 20,
 			}, &addedReviewers)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return nil, err
 			}
 			for _, addedReviewer := range addedReviewers {

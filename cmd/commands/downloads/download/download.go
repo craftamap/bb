@@ -3,6 +3,7 @@ package download
 import (
 	"crypto/rand"
 	"fmt"
+	"github.com/craftamap/bb/util/logging"
 	"io"
 	"math/big"
 	"net/http"
@@ -60,7 +61,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			if dir != "" {
 				info, err := os.Stat(dir)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 				if !info.IsDir() {
@@ -87,51 +88,51 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			c := globalOpts.Client
 			bbrepo := globalOpts.BitbucketRepo
 
-			fmt.Printf("%s%s\n", aurora.Green(":: "), "Getting all downloads")
+			logging.Success("Getting all downloads")
 
 			downloads, err := c.GetDownloads(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
 			downloadMap := downloadsToMap(downloads)
 			dwnld, ok := downloadMap[remoteName]
 			if !ok {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
 			downloadLink := dwnld.Links["self"].Href
 
-			fmt.Printf("%s%s\n", aurora.Green(":: "), fmt.Sprintf("Downloading file from %s", downloadLink))
+			logging.Success(fmt.Sprintf("Downloading file from %s", downloadLink))
 
 			req, err := http.NewRequest("GET", downloadLink, strings.NewReader(""))
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 			req.SetBasicAuth(c.Username, c.Password)
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 			defer resp.Body.Close()
 
-			fmt.Printf("%s%s\n", aurora.Green(":: "), "Downloaded!")
-			fmt.Printf("%s%s\n", aurora.Green(":: "), fmt.Sprintf("Saving file to %s", storagePath))
+			logging.Success("Downloaded!")
+			logging.Success(fmt.Sprintf("Saving file to %s", storagePath))
 
 			out, err := os.Create(storagePath)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 			defer out.Close()
 
 			_, err = io.Copy(out, resp.Body)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 		},

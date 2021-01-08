@@ -2,6 +2,7 @@ package clone
 
 import (
 	"fmt"
+	"github.com/craftamap/bb/util/logging"
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -29,7 +30,7 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					Options: []string{"ssh", "https"},
 				}, &gitProtocol)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 				viper.Set("git_protocol", gitProtocol)
@@ -39,7 +40,7 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			if len(args) == 0 {
 				workspaces, err := c.GetWorkspaces()
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 				// fmt.Println(workspaces)
@@ -54,13 +55,13 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					Options: workspaceSlugs,
 				}, &workspaceSlug)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 				// fmt.Println(workspaceSlug)
 				repos, err := c.RepositoriesForWorkspace(workspaceSlug)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 				repoSlugs := []string{}
@@ -73,7 +74,7 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					Options: repoSlugs,
 				}, &repoOrgaSlug)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 
@@ -81,7 +82,7 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				if len(splitted) == 2 {
 					_, err := c.RepositoryGet(splitted[0], splitted[1])
 					if err != nil {
-						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						logging.Error(err)
 						return
 					}
 
@@ -93,7 +94,7 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				if len(splitted) == 2 {
 					_, err := c.RepositoryGet(splitted[0], splitted[1])
 					if err != nil {
-						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						logging.Error(err)
 						return
 					}
 

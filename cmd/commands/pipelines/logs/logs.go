@@ -2,6 +2,7 @@ package logs
 
 import (
 	"fmt"
+	"github.com/craftamap/bb/util/logging"
 	"strconv"
 	"strings"
 
@@ -29,17 +30,17 @@ func Add(pipelinesCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 			pipelineID, err := strconv.Atoi(strings.Replace(args[0], "#", "", 1))
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 			steps, err := c.PipelineStepsList(bbrepo.RepoOrga, bbrepo.RepoSlug, strconv.Itoa(pipelineID))
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
 			for _, step := range *steps {
-				fmt.Println(aurora.Green("::"), aurora.Bold("step name:"), step.Name)
+				logging.Success(fmt.Sprint(aurora.Bold("step name:"), step.Name))
 				log, _ := c.PipelinesLogs(bbrepo.RepoOrga, bbrepo.RepoSlug, strconv.Itoa(pipelineID), step.UUID)
 				fmt.Println(log)
 			}

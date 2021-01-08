@@ -2,6 +2,7 @@ package login
 
 import (
 	"fmt"
+	"github.com/craftamap/bb/util/logging"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/craftamap/bb/cmd/options"
@@ -21,7 +22,7 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				cont := false
 				err := survey.AskOne(&survey.Confirm{Message: "Do you want to overwrite this?"}, &cont)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 
@@ -30,9 +31,9 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				}
 			}
 
-			fmt.Println(aurora.Green("::"), "In order to use bb, you need to create an app password for bitbucket.org. Navigate to")
-			fmt.Println(aurora.Green("::"), aurora.Index(242, "https://bitbucket.org/account/settings/app-passwords/"))
-			fmt.Println(aurora.Green("::"), "And create an app password for your account with the required permissions.")
+			logging.Success("In order to use bb, you need to create an app password for bitbucket.org. Navigate to")
+			logging.Success(aurora.Index(242, "https://bitbucket.org/account/settings/app-passwords/"))
+			logging.Success("And create an app password for your account with the required permissions.")
 
 			answers := struct {
 				Username string
@@ -55,7 +56,7 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}, &answers)
 
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
@@ -64,11 +65,11 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			err = viper.WriteConfig()
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
-			fmt.Println(aurora.Green("::"), "Stored credentials successfully to", viper.ConfigFileUsed())
+			logging.Success(fmt.Sprint("Stored credentials successfully to", viper.ConfigFileUsed()))
 		},
 	}
 

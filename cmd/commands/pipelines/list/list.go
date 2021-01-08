@@ -2,6 +2,7 @@ package list
 
 import (
 	"fmt"
+	"github.com/craftamap/bb/util/logging"
 	"strings"
 
 	"github.com/craftamap/bb/cmd/options"
@@ -31,7 +32,7 @@ func Add(pipelinesCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			pipelines, err := c.PipelineList(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 			if len(*pipelines) == 0 {

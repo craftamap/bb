@@ -2,6 +2,7 @@ package view
 
 import (
 	"fmt"
+	"github.com/craftamap/bb/util/logging"
 
 	"github.com/charmbracelet/glamour"
 	"github.com/craftamap/bb/cmd/options"
@@ -31,13 +32,13 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			repo, err := c.RepositoryGet(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 			if Web {
 				err := browser.OpenURL(repo.Links["html"].(map[string]interface{})["href"].(string))
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 				return
@@ -45,7 +46,7 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			readme, err := c.GetReadmeContent(bbrepo.RepoOrga, bbrepo.RepoSlug, repo.MainBranch.Name)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
@@ -66,7 +67,7 @@ func PrintSummary(repo *client.Repository, readme string) {
 	if readme != "" {
 		out, err := glamour.Render(readme, "dark")
 		if err != nil {
-			fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+			logging.Error(err)
 			return
 		}
 		fmt.Println(out)

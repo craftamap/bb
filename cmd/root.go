@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/craftamap/bb/util/logging"
 	"os"
 	"path/filepath"
 
@@ -33,7 +34,7 @@ var (
 			if _, ok := cmd.Annotations["RequiresRepository"]; ok {
 				bbrepo, err := bbgit.GetBitbucketRepo(remoteName)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					os.Exit(1)
 				}
 				if !bbrepo.IsBitbucketOrg() {
@@ -83,12 +84,12 @@ func init() {
 
 	err := viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
 	if err != nil {
-		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+		logging.Error(err)
 		return
 	}
 	err = viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
 	if err != nil {
-		fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+		logging.Error(err)
 		return
 	}
 

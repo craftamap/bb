@@ -2,11 +2,11 @@ package upload
 
 import (
 	"fmt"
+	"github.com/craftamap/bb/util/logging"
 	"os"
 	"path/filepath"
 
 	"github.com/craftamap/bb/cmd/options"
-	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ func Add(downloadsCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			bbrepo := globalOpts.BitbucketRepo
 
 			if len(args) == 0 {
-				fmt.Printf("%s%s%s\n", aurora.Yellow(":: "), aurora.Bold("Warning: "), "No file specified")
+				logging.Warning("No file specified")
 				return
 			}
 
@@ -30,23 +30,23 @@ func Add(downloadsCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			fmt.Println(fpath)
 
 			if _, err := os.Stat(fpath); os.IsNotExist(err) {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
-			fmt.Printf("%s Uploading file %s\n", aurora.Green(":: "), filepath.Base(fpath))
+			logging.Success(fmt.Sprintf("Uploading file %s", filepath.Base(fpath)))
 
 			_, err := c.UploadDownload(bbrepo.RepoOrga, bbrepo.RepoSlug, fpath)
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 				return
 			}
 
 			//if err != nil {
-			//	fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+			//	logging.Error(err)
 			//	return
 			//}
 
-			fmt.Printf("%s Uploaded file %s\n", aurora.Green(":: "), filepath.Base(fpath))
+			logging.Success(fmt.Sprintf("Uploaded file %s\n", filepath.Base(fpath)))
 		},
 	}
 

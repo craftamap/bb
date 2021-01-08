@@ -2,6 +2,7 @@ package list
 
 import (
 	"fmt"
+	"github.com/craftamap/bb/util/logging"
 	"strings"
 
 	"github.com/craftamap/bb/cmd/options"
@@ -32,14 +33,14 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			if Web {
 				repo, err := c.RepositoryGet(bbrepo.RepoOrga, bbrepo.RepoSlug)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 				}
 
 				linkWrapper := repo.Links["Html"].(*bitbucket.SubjectTypesRepositoryEvents)
 				link := linkWrapper.Href + "/pull-requests"
 				err = browser.OpenURL(link)
 				if err != nil {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+					logging.Error(err)
 					return
 				}
 
@@ -50,7 +51,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			prs, err := c.PrList(bbrepo.RepoOrga, bbrepo.RepoSlug, []string{state})
 			if err != nil {
-				fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+				logging.Error(err)
 			}
 
 			fmt.Println()
