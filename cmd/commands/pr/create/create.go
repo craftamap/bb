@@ -244,6 +244,10 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 						return
 					}
 
+					fmt.Println(aurora.Bold(aurora.Green("!").String() + " Body:"))
+
+					out, _ := glamour.Render(body, "dark")
+					fmt.Print(out)
 					continue
 				}
 
@@ -372,6 +376,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 								reviewers = append(reviewers, uuid)
 							}
 						}
+
 					}
 				}
 			}
