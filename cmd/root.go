@@ -22,6 +22,9 @@ import (
 )
 
 var (
+	Version   = ""
+	CommitSHA = ""
+
 	rootCmd = &cobra.Command{
 		Use:     "bb",
 		Short:   "Bitbucket.org CLI",
@@ -99,6 +102,17 @@ func init() {
 	auth.Add(rootCmd, &globalOpts)
 	repo.Add(rootCmd, &globalOpts)
 	pipelines.Add(rootCmd, &globalOpts)
+
+
+	if CommitSHA != "" {
+		vt := rootCmd.VersionTemplate()
+		rootCmd.SetVersionTemplate(vt[:len(vt)-1] + " (" + CommitSHA + ")\n")
+	}
+	if Version == "" {
+		Version = "unknown (built from source)"
+	}
+
+	rootCmd.Version = Version
 }
 
 func initConfig() {
