@@ -180,7 +180,15 @@ func (c Client) PrView(repoOrga string, repoSlug string, id string) (*PullReques
 	return &pullRequest, nil
 }
 
-func (c Client) PrCreate(repoOrga string, repoSlug string, sourceBranch string, destinationBranch string, title string, body string, reviewers []string) (*PullRequest, error) {
+func (c Client) PrCreate(
+	repoOrga string,
+	repoSlug string,
+	sourceBranch string,
+	destinationBranch string,
+	title string,
+	body string,
+	reviewers []string,
+	closeBranch bool) (*PullRequest, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
 	opt := &bitbucket.PullRequestsOptions{
@@ -191,6 +199,7 @@ func (c Client) PrCreate(repoOrga string, repoSlug string, sourceBranch string, 
 		Title:             title,
 		Description:       body,
 		Reviewers:         reviewers,
+		CloseSourceBranch: closeBranch,
 	}
 
 	response, err := client.Repositories.PullRequests.Create(opt)

@@ -23,6 +23,7 @@ var (
 	Body        string
 	Destination string
 	Force       bool
+	CloseBranch bool
 )
 
 var (
@@ -49,6 +50,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				title        string
 				body         string
 				defaultBody  string
+				closeBranch  bool
 				reviewers    []string
 			)
 			sourceBranch, err := git.CurrentBranch()
@@ -154,6 +156,10 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				body = Body
 			}
 
+			if CloseBranch {
+				closeBranch = CloseBranch
+			}
+
 			verb := "Creating"
 			if Force {
 				verb = "Re-Creating"
@@ -195,6 +201,12 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				}
 			}
 
+			if closeBranch {
+				fmt.Println("source branch will be closed.")
+			} else {
+				fmt.Println("source branch will NOT be closed.")
+			}
+
 			for {
 				selectNext := &survey.Select{
 					Message: "What's next?",
@@ -204,6 +216,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 						"modify body",
 						"change destination branch",
 						"manage reviewers",
+						"change \"close source branch\" behaviour",
 						"cancel",
 					},
 					Default: "create",
@@ -228,34 +241,55 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 						return
 					}
 					continue
-				}
-
-				if doNext == "modify body" {
+				} else if doNext == "modify body" {
 					body, err = modifyBody(body)
 					if err != nil {
 						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 						return
 					}
 					continue
-				}
-
-				if doNext == "change destination branch" {
+				} else if doNext == "change destination branch" {
 					body, err = changeDestinationBranch(bbrepo, c, targetBranch, sourceBranch, body, defaultBody)
 					if err != nil {
 						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 						return
 					}
-				}
-				if doNext == "manage reviewers" {
+					continue
+				} else if doNext == "manage reviewers" {
 					reviewers, err = manageReviewers(bbrepo, c, currentUser, reviewers)
 					if err != nil {
 						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 						return
 					}
+					continue
+				} else if doNext == "change \"close source branch\" behaviour" {
+					err = survey.AskOne(&survey.Confirm{
+						Message: "Do you want to close the source branch after the branch is being merged?",
+					}, &closeBranch)
+					if err != nil {
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						return
+					}
+
+					if closeBranch {
+						fmt.Println("source branch will be closed.")
+					} else {
+						fmt.Println("source branch will NOT be closed.")
+					}
+					continue
 				}
 			}
 
-			response, err := c.PrCreate(bbrepo.RepoOrga, bbrepo.RepoSlug, sourceBranch, targetBranch, title, body, reviewers)
+			response, err := c.PrCreate(
+				bbrepo.RepoOrga,
+				bbrepo.RepoSlug,
+				sourceBranch,
+				targetBranch,
+				title,
+				body,
+				reviewers,
+				closeBranch,
+			)
 			if err != nil {
 				fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
@@ -268,13 +302,14 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	createCmd.Flags().StringVarP(&Title, "title", "t", "", "Supply a title.")
 	createCmd.Flags().StringVarP(&Destination, "destination", "d", "", "Supply the destination branch of your pull request. Defaults to default branch of the repository")
 	createCmd.Flags().BoolVar(&Force, "force", false, "force creation")
+	createCmd.Flags().BoolVar(&CloseBranch, "close-source-branch", false, "close the source branch after the branch is being merged")
 	prCmd.AddCommand(createCmd)
 }
 
 func modifyBody(body string) (string, error) {
 	body, err := surveyext.Edit("vim", "", body, os.Stdin, os.Stdout, os.Stderr, nil)
 	if err != nil {
-		return "",  err
+		return "", err
 	}
 
 	fmt.Println(aurora.Bold(aurora.Green("!").String() + " Body:"))
