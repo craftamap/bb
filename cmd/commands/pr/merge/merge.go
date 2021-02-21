@@ -2,9 +2,11 @@ package merge
 
 import (
 	"fmt"
-	"github.com/craftamap/bb/util/logging"
 	"strconv"
 	"strings"
+
+	"github.com/craftamap/bb/client"
+	"github.com/craftamap/bb/util/logging"
 
 	"github.com/cli/cli/git"
 	"github.com/craftamap/bb/cmd/commands/pr/view"
@@ -12,8 +14,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	CloseBranch bool
+)
+
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
-	mergeCmd := &cobra.Command{
+	var mergeCmd *cobra.Command
+	mergeCmd = &cobra.Command{
 		Use:   "merge [<number of pr>]",
 		Long:  "Merge a pull request on Bitbucket.org",
 		Short: "Merge a pull request",
@@ -53,10 +60,22 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 				id = prs.Values[0].ID
 			}
-			pr, err := c.PrMerge(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
-			if err != nil {
-				logging.Error(err)
-				return
+
+			var pr *client.PullRequest
+
+			if mergeCmd.Flag("close-source-branch").Changed {
+				pr, err = c.PrMergeWithCloseBranch(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id), CloseBranch)
+				if err != nil {
+					logging.Error(err)
+					return
+				}
+
+			} else {
+				pr, err = c.PrMerge(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
+				if err != nil {
+					logging.Error(err)
+					return
+				}
 			}
 
 			commits, err := c.PrCommits(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
@@ -67,6 +86,8 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			view.PrintSummary(pr, commits)
 		},
 	}
+
+	mergeCmd.Flags().BoolVar(&CloseBranch, "close-source-branch", false, "close the source branch (pr setting if omited)")
 
 	prCmd.AddCommand(mergeCmd)
 }

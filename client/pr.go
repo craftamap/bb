@@ -309,6 +309,29 @@ func (c Client) PrMerge(repoOrga string, repoSlug string, id string) (*PullReque
 	return &pullRequest, nil
 }
 
+func (c Client) PrMergeWithCloseBranch(repoOrga string, repoSlug string, id string, closeBranch bool) (*PullRequest, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opt := &bitbucket.PullRequestsOptions{
+		Owner:             repoOrga,
+		RepoSlug:          repoSlug,
+		ID:                id,
+		CloseSourceBranch: closeBranch,
+	}
+
+	response, err := client.Repositories.PullRequests.Merge(opt)
+	if err != nil {
+		return nil, err
+	}
+
+	var pullRequest PullRequest
+	err = mapstructure.Decode(response, &pullRequest)
+	if err != nil {
+		return nil, err
+	}
+	return &pullRequest, nil
+}
+
 func (c Client) PrComments(repoOrga string, repoSlug string, id string) (*Comments, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 
