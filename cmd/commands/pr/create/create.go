@@ -416,19 +416,20 @@ func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser 
 		}
 
 		if answer == "add reviewer" {
-			fmt.Printf("%s%s%s\n", aurora.Magenta(":: "), aurora.Bold("Note: "), "Currently, only members of the current workspace can be added as reviewers.")
-			fmt.Printf("%s%s%s\n", aurora.Magenta(":: "), aurora.Bold("Note: "), "Currently, there is no way of detecting if a user of your workspace has access to the repository. Adding a wrong user without access to the repository leads to a error while creating the repository.")
+			logging.Note("Currently, only members of the current workspace can be added as reviewers.")
+			logging.Note("Currently, there is no way of detecting if a user of your workspace has access to the repository. Adding a wrong user without access to the repository leads to a error while creating the repository.")
 
 			members, err := c.GetWorkspaceMembers(bbrepo.RepoOrga)
 			if err != nil {
 				logging.Warning(fmt.Sprint("Could not get workspace members - create the pr without reviewers and add them manually using the browser", err))
 				continue
 			}
+			logging.Debugf("members: %+v", members)
 			var nonReviewersMembers []string
 			for _, member := range members.Values {
-				ReviewersNameCache[member.UUID] = member.DisplayName
-				if !stringInSlice(member.UUID, reviewers) && member.UUID != currentUser.Uuid {
-					nonReviewersMembers = append(nonReviewersMembers, member.UUID)
+				ReviewersNameCache[member.User.UUID] = member.User.DisplayName
+				if !stringInSlice(member.User.UUID, reviewers) && member.User.UUID != currentUser.Uuid {
+					nonReviewersMembers = append(nonReviewersMembers, member.User.UUID)
 				}
 			}
 			nameToUUID := map[string]string{}

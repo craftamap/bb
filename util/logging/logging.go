@@ -2,8 +2,17 @@ package logging
 
 import (
 	"fmt"
+
 	"github.com/logrusorgru/aurora"
 )
+
+func Debug(message ...interface{}) {
+	fmt.Printf("%s%s\n", aurora.BgCyan(":: "+aurora.Bold("DEBUG: ").String()), fmt.Sprint(message...))
+}
+
+func Debugf(message ...interface{}) {
+	fmt.Printf("%s%s\n", aurora.BgCyan(":: "+aurora.Bold("DEBUG: ").String()), fmt.Sprintf(message[0].(string), message[1:]...))
+}
 
 func Error(message ...interface{}) {
 	fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), message)

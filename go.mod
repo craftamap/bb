@@ -9,7 +9,7 @@ require (
 	github.com/cli/safeexec v1.0.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
-	github.com/ktrysmt/go-bitbucket v0.9.2
+	github.com/ktrysmt/go-bitbucket v0.9.10
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mitchellh/mapstructure v1.3.3

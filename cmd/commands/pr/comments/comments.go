@@ -2,16 +2,17 @@ package comments
 
 import (
 	"fmt"
-	"github.com/craftamap/bb/util/logging"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/craftamap/bb/util/logging"
+
 	"github.com/charmbracelet/glamour"
 	"github.com/cli/cli/git"
-	"github.com/craftamap/bb/cmd/options"
 	"github.com/craftamap/bb/client"
+	"github.com/craftamap/bb/cmd/options"
 	"github.com/kyokomi/emoji"
 	"github.com/logrusorgru/aurora"
 	"github.com/muesli/reflow/wordwrap"
@@ -70,7 +71,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			members, err := c.GetWorkspaceMembers(bbrepo.RepoOrga)
 			if err == nil {
 				for _, member := range members.Values {
-					ReviewersNameCache[member.AccountID] = member.DisplayName
+					ReviewersNameCache[member.User.AccountID] = member.User.DisplayName
 				}
 			}
 

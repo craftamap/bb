@@ -15,12 +15,17 @@ type Workspace struct {
 	UUID      string                 `mapstructure:"uuid"`
 }
 
+type WorkspaceMembership struct {
+	User      Account   `mapstructure:"user"`
+	Workspace Workspace `mapstructure:"workspace"`
+}
+
 type Workspaces struct {
 	Workspaces []Workspace `mapstructure:"workspaces"`
 }
 
 type Members struct {
-	Values []Account `mapstructure:"values"`
+	Values []WorkspaceMembership `mapstructure:"values"`
 }
 
 func (c Client) GetWorkspaceMembers(workspace string) (*Members, error) {
