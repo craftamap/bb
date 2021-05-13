@@ -2,8 +2,9 @@ package clone
 
 import (
 	"fmt"
-	"github.com/craftamap/bb/util/logging"
 	"strings"
+
+	"github.com/craftamap/bb/util/logging"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/cli/cli/git"

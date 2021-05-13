@@ -2,11 +2,12 @@ package checkout
 
 import (
 	"fmt"
-	"github.com/craftamap/bb/util/logging"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/craftamap/bb/util/logging"
 
 	"github.com/cli/cli/git"
 	"github.com/cli/safeexec"

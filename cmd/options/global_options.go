@@ -1,8 +1,8 @@
 package options
 
 import (
-	bbgit "github.com/craftamap/bb/git"
 	"github.com/craftamap/bb/client"
+	bbgit "github.com/craftamap/bb/git"
 )
 
 type GlobalOptions struct {

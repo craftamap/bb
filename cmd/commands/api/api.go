@@ -3,11 +3,12 @@ package api
 import (
 	"bytes"
 	"fmt"
-	"github.com/craftamap/bb/util/logging"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/craftamap/bb/util/logging"
 
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/logrusorgru/aurora"

@@ -2,9 +2,10 @@ package approve
 
 import (
 	"fmt"
-	"github.com/craftamap/bb/util/logging"
 	"strconv"
 	"strings"
+
+	"github.com/craftamap/bb/util/logging"
 
 	"github.com/cli/cli/git"
 	"github.com/craftamap/bb/cmd/options"

@@ -2,9 +2,10 @@ package upload
 
 import (
 	"fmt"
-	"github.com/craftamap/bb/util/logging"
 	"os"
 	"path/filepath"
+
+	"github.com/craftamap/bb/util/logging"
 
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/spf13/cobra"

@@ -2,11 +2,12 @@ package view
 
 import (
 	"fmt"
+
 	"github.com/craftamap/bb/util/logging"
 
 	"github.com/charmbracelet/glamour"
-	"github.com/craftamap/bb/cmd/options"
 	"github.com/craftamap/bb/client"
+	"github.com/craftamap/bb/cmd/options"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"

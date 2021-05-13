@@ -2,6 +2,7 @@ package login
 
 import (
 	"fmt"
+
 	"github.com/craftamap/bb/util/logging"
 
 	"github.com/AlecAivazis/survey/v2"

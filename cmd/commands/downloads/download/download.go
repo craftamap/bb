@@ -3,7 +3,6 @@ package download
 import (
 	"crypto/rand"
 	"fmt"
-	"github.com/craftamap/bb/util/logging"
 	"io"
 	"math/big"
 	"net/http"
@@ -11,8 +10,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/craftamap/bb/cmd/options"
+	"github.com/craftamap/bb/util/logging"
+
 	"github.com/craftamap/bb/client"
+	"github.com/craftamap/bb/cmd/options"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )

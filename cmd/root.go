@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/craftamap/bb/util/logging"
 	"os"
 	"path/filepath"
 
+	"github.com/craftamap/bb/util/logging"
+
+	"github.com/craftamap/bb/client"
 	"github.com/craftamap/bb/cmd/commands/api"
 	"github.com/craftamap/bb/cmd/commands/auth"
 	"github.com/craftamap/bb/cmd/commands/downloads"
@@ -14,7 +16,6 @@ import (
 	"github.com/craftamap/bb/cmd/commands/repo"
 	"github.com/craftamap/bb/cmd/options"
 	bbgit "github.com/craftamap/bb/git"
-	"github.com/craftamap/bb/client"
 	"github.com/kirsle/configdir"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
@@ -102,7 +103,6 @@ func init() {
 	auth.Add(rootCmd, &globalOpts)
 	repo.Add(rootCmd, &globalOpts)
 	pipelines.Add(rootCmd, &globalOpts)
-
 
 	if CommitSHA != "" {
 		vt := rootCmd.VersionTemplate()
