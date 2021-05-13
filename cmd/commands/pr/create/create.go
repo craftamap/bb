@@ -440,7 +440,7 @@ func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser 
 				nameToUUID[name] = rev
 			}
 			if len(listOfNames) == 0 {
-				logging.Warning("No reviwers to add available")
+				logging.Warning("No reviewers to add available")
 				continue
 			}
 			var addedReviewers []string

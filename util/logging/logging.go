@@ -6,12 +6,20 @@ import (
 	"github.com/logrusorgru/aurora"
 )
 
+var (
+	PrintDebugLogs = false
+)
+
 func Debug(message ...interface{}) {
-	fmt.Printf("%s%s\n", aurora.BgCyan(":: "+aurora.Bold("DEBUG: ").String()), fmt.Sprint(message...))
+	if PrintDebugLogs {
+		fmt.Printf("%s%s\n", aurora.BgCyan(":: "+aurora.Bold("DEBUG: ").String()), fmt.Sprint(message...))
+	}
 }
 
 func Debugf(message ...interface{}) {
-	fmt.Printf("%s%s\n", aurora.BgCyan(":: "+aurora.Bold("DEBUG: ").String()), fmt.Sprintf(message[0].(string), message[1:]...))
+	if PrintDebugLogs {
+		fmt.Printf("%s%s\n", aurora.BgCyan(":: "+aurora.Bold("DEBUG: ").String()), fmt.Sprintf(message[0].(string), message[1:]...))
+	}
 }
 
 func Error(message ...interface{}) {
