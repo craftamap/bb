@@ -85,6 +85,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&username, "username", "", "username")
 	rootCmd.PersistentFlags().StringVar(&password, "password", "", "app password")
 	rootCmd.PersistentFlags().StringVar(&remoteName, "remote", "origin", "if you are in a repository and don't want to interact with the default origin, you can change it")
+	rootCmd.PersistentFlags().BoolVar(&logging.PrintDebugLogs, "debug", false, "enabling this flag allows debug logs to be printed")
 
 	err := viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
 	if err != nil {
