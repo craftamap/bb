@@ -15,7 +15,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/k0kubun/pp v3.0.1+incompatible // indirect
 	github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
-	github.com/ktrysmt/go-bitbucket v0.9.12
+	github.com/ktrysmt/go-bitbucket v0.9.15
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/magiconair/properties v1.8.5 // indirect
