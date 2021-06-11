@@ -55,7 +55,28 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			fmt.Printf("%sShowing %d of %d issues in %s/%s\n", aurora.Blue(" :: "), len(issues.Values), issues.Size, bbrepo.RepoOrga, bbrepo.RepoSlug)
 			fmt.Println()
 			for _, issue := range issues.Values {
-				fmt.Printf("#%03d  %s\n", aurora.Green(issue.ID), issue.Title)
+				var state string
+				switch issue.State {
+				case "new":
+					state = aurora.BgIndex(55, "    NEW    ").String()
+				case "open":
+					state = aurora.BgGray(12, "   OPEN    ").String()
+				case "on hold":
+					state = aurora.BgBlue("  ON HOLD  ").String()
+				case "invalid":
+					state = aurora.BgRed("  INVALID  ").String()
+				case "resolved":
+					state = aurora.BgGreen(" RESOLVED  ").String()
+				case "duplicate":
+					state = aurora.BgYellow(" DUPLICATE ").String()
+				case "wontfix":
+					state = aurora.BgRed("  WONTFIX  ").String()
+				case "closed":
+					state = aurora.BgGreen("  CLOSED   ").String()
+				default:
+					state = issue.State
+				}
+				fmt.Printf("#%03d %s  %s\n", aurora.Green(issue.ID), state, issue.Title)
 			}
 		},
 	}
