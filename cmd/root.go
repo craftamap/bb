@@ -11,6 +11,7 @@ import (
 	"github.com/craftamap/bb/cmd/commands/api"
 	"github.com/craftamap/bb/cmd/commands/auth"
 	"github.com/craftamap/bb/cmd/commands/downloads"
+	"github.com/craftamap/bb/cmd/commands/issue"
 	"github.com/craftamap/bb/cmd/commands/pipelines"
 	"github.com/craftamap/bb/cmd/commands/pr"
 	"github.com/craftamap/bb/cmd/commands/repo"
@@ -99,6 +100,7 @@ func init() {
 	}
 
 	pr.Add(rootCmd, &globalOpts)
+	issue.Add(rootCmd, &globalOpts)
 	api.Add(rootCmd, &globalOpts)
 	downloads.Add(rootCmd, &globalOpts)
 	auth.Add(rootCmd, &globalOpts)

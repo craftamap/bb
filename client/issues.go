@@ -1,0 +1,84 @@
+package client
+
+import (
+	"strings"
+
+	"github.com/ktrysmt/go-bitbucket"
+	"github.com/mitchellh/mapstructure"
+)
+
+type ListIssues struct {
+	Values []Issue `mapstructure:"values"`
+	Size   int     `mapstructure:"size"`
+}
+
+type Issue struct {
+	ID         int             `mapstructure:"id"`
+	Priority   string          `mapstructure:"priority"`
+	Kind       string          `mapstructure:"kind"`
+	Repository Repository      `mapstructure:"repository"`
+	Links      map[string]Link `mapstructure:"links"`
+	Reporter   Account         `mapstructure:"reporter"`
+	Title      string          `mapstructure:"title"`
+	Component  Component       `mapstructure:"component"`
+	Votes      int64           `mapstructure:"votes"`
+	Watches    int64           `mapstructure:"watches"`
+	Content    CommentContent  `mapstructure:"content"`
+	Assignee   Account         `mapstructure:"assignee"`
+	State      string          `mapstructure:"state"`
+	Version    Version         `mapstructure:"version"`
+	CreatedOn  string          `mapstructure:"created_on"`
+	EditedOn   string          `mapstructure:"edited_on"`
+	UpdatedOn  string          `mapstructure:"edited_on"`
+	Milestone  Milestone       `mapstructure:"milestone"`
+}
+
+type Version struct {
+	Name  string          `mapstructure:"name"`
+	Links map[string]Link `mapstructure:"links"`
+}
+
+type Milestone struct {
+	Name  string          `mapstructure:"name"`
+	Links map[string]Link `mapstructure:"links"`
+}
+
+type Component struct {
+	Name  string          `mapstructure:"name"`
+	Links map[string]Link `mapstructure:"links"`
+}
+
+func (c Client) IssuesList(repoOrga string, repoSlug string, states []string) (*ListIssues, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+	var query strings.Builder
+	query.WriteString("(")
+	for i, state := range states {
+		query.WriteString("state = \"")
+		query.WriteString(state)
+		query.WriteString("\" ")
+		if i != len(states)-1 {
+			query.WriteString("OR ")
+		}
+	}
+	query.WriteString(")")
+
+	opts := bitbucket.IssuesOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		Query:    query.String(),
+	}
+
+	response, err := client.Repositories.Issues.Gets(&opts)
+	if err != nil {
+		return nil, err
+	}
+
+	var issues ListIssues
+	err = mapstructure.Decode(response, &issues)
+	if err != nil {
+		return nil, err
+	}
+
+	return &issues, nil
+
+}
