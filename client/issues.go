@@ -16,6 +16,7 @@ type Issue struct {
 	ID         int             `mapstructure:"id"`
 	Priority   string          `mapstructure:"priority"`
 	Kind       string          `mapstructure:"kind"`
+	Type       string          `mapstructure:"type"`
 	Repository Repository      `mapstructure:"repository"`
 	Links      map[string]Link `mapstructure:"links"`
 	Reporter   Account         `mapstructure:"reporter"`
@@ -80,5 +81,27 @@ func (c Client) IssuesList(repoOrga string, repoSlug string, states []string) (*
 	}
 
 	return &issues, nil
+}
 
+func (c Client) IssuesView(repoOrga string, repoSlug string, id string) (*Issue, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opts := bitbucket.IssuesOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	response, err := client.Repositories.Issues.Get(&opts)
+	if err != nil {
+		return nil, err
+	}
+
+	var issue Issue
+	err = mapstructure.Decode(response, &issue)
+	if err != nil {
+		return nil, err
+	}
+
+	return &issue, nil
 }

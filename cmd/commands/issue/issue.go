@@ -2,6 +2,7 @@ package issue
 
 import (
 	"github.com/craftamap/bb/cmd/commands/issue/list"
+	"github.com/craftamap/bb/cmd/commands/issue/view"
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/spf13/cobra"
 )
@@ -14,6 +15,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	}
 
 	list.Add(&issueCommand, globalOpts)
+	view.Add(&issueCommand, globalOpts)
 
 	rootCmd.AddCommand(&issueCommand)
 }
