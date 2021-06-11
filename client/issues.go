@@ -49,6 +49,42 @@ type Component struct {
 	Links map[string]Link `mapstructure:"links"`
 }
 
+type IssueComments struct {
+	Values []IssueComment `mapstructure:"values"`
+	Size   int            `mapstructure:"size"`
+}
+
+type IssueComment struct {
+	ID        int             `mapstructure:"id"`
+	Type      string          `mapstructure:"type"`
+	Links     map[string]Link `mapstructure:"links"`
+	Issue     Issue           `mapstructure:"issue"`
+	Content   CommentContent  `mapstructure:"content"`
+	CreatedOn string          `mapstructure:"created_on"`
+	User      Account         `mapstructure:"user"`
+	UpdatedOn string          `mapstructure:"edited_on"`
+}
+
+type IssueChanges struct {
+	Values []IssueChange `mapstructure:"values"`
+	Size   int           `mapstructure:"size"`
+}
+type IssueChange struct {
+	ID        int               `mapstructure:"id"`
+	Type      string            `mapstructure:"type"`
+	Links     map[string]Link   `mapstructure:"links"`
+	Issue     Issue             `mapstructure:"issue"`
+	CreatedOn string            `mapstructure:"created_on"`
+	User      Account           `mapstructure:"user"`
+	Changes   map[string]Change `mapstructure:"changes"`
+	Message   CommentContent    `mapstructure:"message"`
+}
+
+type Change struct {
+	New string `mapstructure:"new"`
+	Old string `mapstructure:"old"`
+}
+
 func (c Client) IssuesList(repoOrga string, repoSlug string, states []string) (*ListIssues, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 	var query strings.Builder
@@ -104,4 +140,53 @@ func (c Client) IssuesView(repoOrga string, repoSlug string, id string) (*Issue,
 	}
 
 	return &issue, nil
+}
+
+func (c Client) IssuesViewComments(repoOrga string, repoSlug string, id string) (*IssueComments, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opts := bitbucket.IssuesOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	response, err := client.Repositories.Issues.GetComments(&bitbucket.IssueCommentsOptions{
+		IssuesOptions: opts,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var issueComments IssueComments
+	err = mapstructure.Decode(response, &issueComments)
+	if err != nil {
+		return nil, err
+	}
+
+	return &issueComments, nil
+}
+
+func (c Client) IssuesViewChanges(repoOrga string, repoSlug string, id string) (*IssueChanges, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+	opts := bitbucket.IssuesOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	response, err := client.Repositories.Issues.GetChanges(&bitbucket.IssueChangesOptions{
+		IssuesOptions: opts,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var issueChanges IssueChanges
+	err = mapstructure.Decode(response, &issueChanges)
+	if err != nil {
+		return nil, err
+	}
+
+	return &issueChanges, nil
 }

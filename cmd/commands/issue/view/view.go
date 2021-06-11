@@ -56,14 +56,26 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 
-			PrintSummary(issue)
+			issueComments, err := c.IssuesViewComments(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
+			if err != nil {
+				logging.Error(err)
+				return
+			}
+
+			issueChanges, err := c.IssuesViewChanges(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
+			if err != nil {
+				logging.Error(err)
+				return
+			}
+
+			PrintSummary(issue, issueComments, issueChanges)
 		},
 	}
 	viewCmd.Flags().BoolVar(&Web, "web", false, "view the issue in your browser")
 	issueCmd.AddCommand(viewCmd)
 }
 
-func PrintSummary(issue *client.Issue) {
+func PrintSummary(issue *client.Issue, issueComments *client.IssueComments, issueChanges *client.IssueChanges) {
 	fmt.Println(aurora.Bold(issue.Title))
 	var state string
 	switch issue.State {
@@ -87,7 +99,7 @@ func PrintSummary(issue *client.Issue) {
 		state = issue.State
 	}
 
-	infoText := aurora.Index(242, fmt.Sprintf("%s opened %s", issue.Repository.FullName, issue.CreatedOn))
+	infoText := aurora.Index(242, fmt.Sprintf("%s opened %s", issue.Reporter.DisplayName, issue.CreatedOn))
 	fmt.Printf("%s • %s\n", state, infoText)
 	assignee := issue.Assignee.DisplayName
 	if assignee == "" {
@@ -124,6 +136,30 @@ func PrintSummary(issue *client.Issue) {
 			return
 		}
 		fmt.Println(out)
+	}
+	if len(issueComments.Values) > 0 {
+		idToissueChange := map[int]client.IssueChange{}
+		for _, issueChange := range issueChanges.Values {
+			idToissueChange[issueChange.ID] = issueChange
+		}
+
+		for _, comment := range issueComments.Values {
+			fmt.Println(aurora.Bold(comment.User.DisplayName), "•", comment.CreatedOn)
+			var changesStr strings.Builder
+			if ic, ok := idToissueChange[comment.ID]; ok {
+				changesStr.WriteString("Changes:\n")
+				for key, change := range ic.Changes {
+					changesStr.WriteString(fmt.Sprintln(" - changed", key, "to", change.New))
+				}
+				changesStr.WriteString("\n")
+			}
+			out, err := glamour.Render(changesStr.String()+comment.Content.Raw, "dark")
+			if err != nil {
+				logging.Error(err)
+				return
+			}
+			fmt.Print(out)
+		}
 	}
 
 	footer := aurora.Index(242, fmt.Sprintf("View this issue on Bitbucket.org: %s", issue.Links["html"].Href)).String()
