@@ -252,3 +252,15 @@ func (c Client) IssuesComment(repoOrga string, repoSlug string, id string, messa
 	err = mapstructure.Decode(response, &issueComment)
 	return &issueComment, err
 }
+
+func (c Client) IssuesDelete(repoOrga string, repoSlug string, id string) (interface{}, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opts := bitbucket.IssuesOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	return client.Repositories.Issues.Delete(&opts)
+}
