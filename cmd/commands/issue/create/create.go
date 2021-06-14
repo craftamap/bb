@@ -2,7 +2,9 @@ package create
 
 import (
 	"fmt"
+	"net/url"
 	"os"
+	"path"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/charmbracelet/glamour"
@@ -115,22 +117,26 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				}
 			}
 
-			//			response, err := c.PrCreate(
-			//				bbrepo.RepoOrga,
-			//				bbrepo.RepoSlug,
-			//				sourceBranch,
-			//				targetBranch,
-			//				title,
-			//				description,
-			//				reviewers,
-			//				closeBranch,
-			//			)
+			response, err := c.IssuesCreate(bbrepo.RepoOrga, bbrepo.RepoSlug, struct {
+				Title       string
+				Description string
+				Assignee    string
+			}{
+				Title:       title,
+				Description: description,
+				Assignee:    assignee,
+			})
 			if err != nil {
 				fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
 			}
 
-			//			fmt.Printf("Take a look at your pull request here: %s\n", aurora.Index(242, response.Links["html"].Href))
+			link, err := url.Parse(response.Repository.Links["html"].(map[string]interface{})["href"].(string))
+			link.Path = path.Join(link.Path, "issues", fmt.Sprintf("%d", response.ID))
+			if err != nil {
+				logging.Error(err)
+			}
+			fmt.Printf("Take a look at your issue here: %s\n", aurora.Index(242, link.String()))
 		},
 	}
 	createCmd.Flags().StringVarP(&Description, "description", "b", "", "Supply a description.")
@@ -180,9 +186,9 @@ func selectAssignee(bbrepo *bbgit.BitbucketRepo, c *client.Client, assignee stri
 
 	for _, member := range members.Values {
 		listOfNames = append(listOfNames, member.User.DisplayName)
-		nameToUUID[member.User.DisplayName] = member.User.AccountID
+		nameToUUID[member.User.DisplayName] = member.User.UUID
 
-		if assignee == member.User.AccountID {
+		if assignee == member.User.UUID {
 			assigneeName = member.User.DisplayName
 		}
 	}
