@@ -230,3 +230,25 @@ func (c Client) IssuesCreate(repoOrga string, repoSlug string, options struct {
 
 	return &issue, nil
 }
+
+func (c Client) IssuesComment(repoOrga string, repoSlug string, id string, message string) (*IssueComment, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opts := bitbucket.IssuesOptions{
+		Owner:    repoOrga,
+		RepoSlug: repoSlug,
+		ID:       id,
+	}
+
+	response, err := client.Repositories.Issues.CreateComment(&bitbucket.IssueCommentsOptions{
+		IssuesOptions:  opts,
+		CommentContent: message,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var issueComment IssueComment
+	err = mapstructure.Decode(response, &issueComment)
+	return &issueComment, err
+}
