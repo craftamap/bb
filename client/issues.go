@@ -231,6 +231,48 @@ func (c Client) IssuesCreate(repoOrga string, repoSlug string, options struct {
 	return &issue, nil
 }
 
+func (c Client) IssuesEdit(repoOrga string, repoSlug string, id string, options struct {
+	Title       string
+	Description string
+	Assignee    string
+	Kind        string
+	Priority    string
+	Status      string
+	Version     string
+	Milestone   string
+	Component   string
+}) (*Issue, error) {
+	client := bitbucket.NewBasicAuth(c.Username, c.Password)
+
+	opts := bitbucket.IssuesOptions{
+		ID:        id,
+		Owner:     repoOrga,
+		RepoSlug:  repoSlug,
+		Title:     options.Title,
+		Content:   options.Description,
+		Assignee:  options.Assignee,
+		Kind:      options.Kind,
+		Priority:  options.Priority,
+		State:     options.Status,
+		Version:   options.Version,
+		Milestone: options.Milestone,
+		Component: options.Component,
+	}
+
+	response, err := client.Repositories.Issues.Update(&opts)
+	if err != nil {
+		return nil, err
+	}
+
+	var issue Issue
+	err = mapstructure.Decode(response, &issue)
+	if err != nil {
+		return nil, err
+	}
+
+	return &issue, nil
+}
+
 func (c Client) IssuesComment(repoOrga string, repoSlug string, id string, message string) (*IssueComment, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 

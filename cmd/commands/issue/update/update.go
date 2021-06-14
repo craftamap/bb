@@ -1,11 +1,12 @@
-package create
+package update
 
 import (
 	"fmt"
 	"net/url"
 	"path"
+	"strconv"
+	"strings"
 
-	"github.com/AlecAivazis/survey/v2"
 	"github.com/craftamap/bb/cmd/commands/issue/shared"
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/craftamap/bb/util/logging"
@@ -26,9 +27,9 @@ var (
 )
 
 func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
-	createCmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create a issue",
+	updateCmd := &cobra.Command{
+		Use:   "update <id>",
+		Short: "Updates a issue",
 		Annotations: map[string]string{
 			"RequiresClient":     "true",
 			"RequiresRepository": "true",
@@ -36,11 +37,36 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		Run: func(cmd *cobra.Command, args []string) {
 			// Initialisation
 			var err error
+			var id int
+
+			if len(args) > 0 {
+				id, err = strconv.Atoi(strings.TrimPrefix(args[0], "#"))
+				if err != nil {
+					logging.Error(err)
+					return
+				}
+			}
 
 			c := globalOpts.Client
 			bbrepo := globalOpts.BitbucketRepo
 
 			io := shared.IssueOptions{}
+
+			currentIssue, err := c.IssuesView(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
+			if err != nil {
+				logging.Error(err)
+				return
+			}
+
+			io.Title = currentIssue.Title
+			io.Description = currentIssue.Content.Raw
+			io.Assignee = currentIssue.Assignee.UUID
+			io.Kind = currentIssue.Kind
+			io.Component = currentIssue.Component.Name
+			io.Milestone = currentIssue.Milestone.Name
+			io.Priority = currentIssue.Priority
+			io.Status = currentIssue.State
+			io.Version = currentIssue.Version.Name
 
 			// Apply command line args here
 			if Title != "" {
@@ -75,21 +101,8 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				io.Component = Component
 			}
 
-			fmt.Printf("Creating issue in %s\n", fmt.Sprintf("%s/%s", bbrepo.RepoOrga, bbrepo.RepoSlug))
+			fmt.Printf("Updating issue in %s\n", fmt.Sprintf("%s/%s", bbrepo.RepoOrga, bbrepo.RepoSlug))
 			fmt.Println()
-
-			// If the title was already specified as command line argument, don't ask for it
-			if Title == "" {
-				questionTitle := &survey.Input{
-					Message: "Title",
-					Default: io.Title,
-				}
-				err = survey.AskOne(questionTitle, &io.Title, survey.WithValidator(survey.Required))
-			}
-			if err != nil {
-				logging.Error(err)
-				return
-			}
 
 			io, err, cancel := shared.AskQuestionsForCreateOrUpdate(io, bbrepo, c)
 			if err != nil {
@@ -100,7 +113,7 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 
-			response, err := c.IssuesCreate(bbrepo.RepoOrga, bbrepo.RepoSlug, io)
+			response, err := c.IssuesEdit(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id), io)
 			if err != nil {
 				fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
 				return
@@ -114,13 +127,13 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			fmt.Printf("Take a look at your issue here: %s\n", aurora.Index(242, link.String()))
 		},
 	}
-	createCmd.Flags().StringVarP(&Description, "description", "b", "", "Supply a description.")
-	createCmd.Flags().StringVarP(&Title, "title", "t", "", "Supply a title.")
-	createCmd.Flags().StringVar(&Kind, "type", "", "Supply a issue type.")
-	createCmd.Flags().StringVar(&Priority, "priority", "", "Supply a issue priority.")
-	createCmd.Flags().StringVar(&Status, "status", "", "Supply a issue status.")
-	createCmd.Flags().StringVar(&Version, "issue-version", "", "Supply a version.")
-	createCmd.Flags().StringVar(&Milestone, "milestone", "", "Supply a milestone.")
-	createCmd.Flags().StringVar(&Component, "component", "", "Supply a component.")
-	issueCmd.AddCommand(createCmd)
+	updateCmd.Flags().StringVarP(&Description, "description", "b", "", "Supply a description.")
+	updateCmd.Flags().StringVarP(&Title, "title", "t", "", "Supply a title.")
+	updateCmd.Flags().StringVar(&Kind, "type", "", "Supply a issue type.")
+	updateCmd.Flags().StringVar(&Priority, "priority", "", "Supply a issue priority.")
+	updateCmd.Flags().StringVar(&Status, "status", "", "Supply a issue status.")
+	updateCmd.Flags().StringVar(&Version, "issue-version", "", "Supply a version.")
+	updateCmd.Flags().StringVar(&Milestone, "milestone", "", "Supply a milestone.")
+	updateCmd.Flags().StringVar(&Component, "component", "", "Supply a component.")
+	issueCmd.AddCommand(updateCmd)
 }
