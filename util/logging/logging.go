@@ -39,5 +39,5 @@ func Success(message ...interface{}) {
 }
 
 func SuccessExclamation(message ...interface{}) {
-	fmt.Printf("%s%s", aurora.Bold(aurora.Green("! ")), aurora.Bold(fmt.Sprint(message...)))
+	fmt.Printf("%s%s\n", aurora.Bold(aurora.Green("! ")), aurora.Bold(fmt.Sprint(message...)))
 }
