@@ -21,6 +21,12 @@ var (
 	Title       string
 	Description string
 	Assignee    string
+	Kind        string
+	Priority    string
+	Status      string
+	Version     string
+	Milestone   string
+	Component   string
 )
 
 func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
@@ -42,6 +48,12 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				description string
 				assignee    string
 				err         error
+				kind        string
+				priority    string
+				status      string
+				version     string
+				milestone   string
+				component   string
 			)
 			// Apply command line args here
 			if Title != "" {
@@ -50,6 +62,30 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			if Description != "" {
 				description = Description
+			}
+
+			if Kind != "" {
+				kind = Kind
+			}
+
+			if Priority != "" {
+				priority = Priority
+			}
+
+			if Status != "" {
+				status = Status
+			}
+
+			if Version != "" {
+				version = Version
+			}
+
+			if Milestone != "" {
+				milestone = Milestone
+			}
+
+			if Component != "" {
+				component = Component
 			}
 
 			fmt.Printf("Creating issue in %s\n", fmt.Sprintf("%s/%s", bbrepo.RepoOrga, bbrepo.RepoSlug))
@@ -76,6 +112,12 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 						"modify title",
 						"modify description",
 						"select assignee",
+						"modify kind",
+						"modify priority",
+						"modify status",
+						"modify component",
+						"modify milestone",
+						"modify version",
 						"cancel",
 					},
 					Default: "create",
@@ -114,6 +156,48 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 						return
 					}
 					continue
+				} else if doNext == "modify kind" {
+					kind, err = namedSelectFromOptions("kind", []string{"bug", "enhancement", "proposal", "task"}, kind)
+					if err != nil {
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						return
+					}
+					continue
+				} else if doNext == "modify priority" {
+					priority, err = namedSelectFromOptions("priority", []string{"trivial", "minor", "major", "critical", "blocker"}, priority)
+					if err != nil {
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						return
+					}
+					continue
+				} else if doNext == "modify status" {
+					status, err = namedSelectFromOptions("status", []string{"new", "open", "resolved", "invalid", "duplicate", "wontfix", "closed", "on hold"}, status)
+					if err != nil {
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						return
+					}
+					continue
+				} else if doNext == "modify component" {
+					component, err = namedInput("component", component)
+					if err != nil {
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						return
+					}
+					continue
+				} else if doNext == "modify milestone" {
+					milestone, err = namedInput("milestone", milestone)
+					if err != nil {
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						return
+					}
+					continue
+				} else if doNext == "modify version" {
+					version, err = namedInput("version", version)
+					if err != nil {
+						fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
+						return
+					}
+					continue
 				}
 			}
 
@@ -121,10 +205,22 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				Title       string
 				Description string
 				Assignee    string
+				Kind        string
+				Priority    string
+				Status      string
+				Version     string
+				Milestone   string
+				Component   string
 			}{
 				Title:       title,
 				Description: description,
 				Assignee:    assignee,
+				Kind:        kind,
+				Priority:    priority,
+				Status:      status,
+				Version:     version,
+				Milestone:   milestone,
+				Component:   component,
 			})
 			if err != nil {
 				fmt.Printf("%s%s%#v\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), err)
@@ -141,6 +237,12 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	}
 	createCmd.Flags().StringVarP(&Description, "description", "b", "", "Supply a description.")
 	createCmd.Flags().StringVarP(&Title, "title", "t", "", "Supply a title.")
+	createCmd.Flags().StringVar(&Kind, "type", "", "Supply a issue type.")
+	createCmd.Flags().StringVar(&Priority, "priority", "", "Supply a issue priority.")
+	createCmd.Flags().StringVar(&Status, "status", "", "Supply a issue status.")
+	createCmd.Flags().StringVar(&Version, "issue-version", "", "Supply a version.")
+	createCmd.Flags().StringVar(&Milestone, "milestone", "", "Supply a milestone.")
+	createCmd.Flags().StringVar(&Component, "component", "", "Supply a component.")
 	issueCmd.AddCommand(createCmd)
 }
 
@@ -207,4 +309,33 @@ func selectAssignee(bbrepo *bbgit.BitbucketRepo, c *client.Client, assignee stri
 	}
 	assignee = nameToUUID[assigneeName]
 	return assignee, nil
+}
+
+func namedSelectFromOptions(name string, options []string, value string) (string, error) {
+	question := &survey.Select{
+		Message: name,
+		Default: value,
+		Options: options,
+	}
+	err := survey.AskOne(question, &value)
+	if err != nil {
+		return "", err
+	}
+	logging.Success(name, value)
+
+	return value, nil
+}
+
+func namedInput(name string, value string) (string, error) {
+	question := &survey.Input{
+		Message: name,
+		Default: value,
+	}
+	err := survey.AskOne(question, &value)
+	if err != nil {
+		return "", err
+	}
+	logging.Success(name, value)
+
+	return value, nil
 }

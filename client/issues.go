@@ -195,14 +195,26 @@ func (c Client) IssuesCreate(repoOrga string, repoSlug string, options struct {
 	Title       string
 	Description string
 	Assignee    string
+	Kind        string
+	Priority    string
+	Status      string
+	Version     string
+	Milestone   string
+	Component   string
 }) (*Issue, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 	opts := bitbucket.IssuesOptions{
-		Owner:    repoOrga,
-		RepoSlug: repoSlug,
-		Title:    options.Title,
-		Content:  options.Description,
-		Assignee: options.Assignee,
+		Owner:     repoOrga,
+		RepoSlug:  repoSlug,
+		Title:     options.Title,
+		Content:   options.Description,
+		Assignee:  options.Assignee,
+		Kind:      options.Kind,
+		Priority:  options.Priority,
+		State:     options.Status,
+		Version:   options.Version,
+		Milestone: options.Milestone,
+		Component: options.Component,
 	}
 
 	response, err := client.Repositories.Issues.Create(&opts)
