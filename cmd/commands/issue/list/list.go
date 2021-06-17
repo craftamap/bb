@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	Web    bool
-	States []string
+	Web        bool
+	States     []string
+	Types      []string
+	Priorities []string
 )
 
 func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
@@ -52,7 +54,19 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				}
 			}
 
-			issues, err := c.IssuesList(bbrepo.RepoOrga, bbrepo.RepoSlug, States)
+			for _, typus := range Types {
+				if strings.ToUpper(typus) == "ALL" {
+					Types = []string{"bug", "enhancement", "proposal", "task"}
+				}
+			}
+
+			for _, priority := range Priorities {
+				if strings.ToUpper(priority) == "ALL" {
+					Priorities = []string{"trivial", "minor", "major", "critical", "blocker"}
+				}
+			}
+
+			issues, err := c.IssuesList(bbrepo.RepoOrga, bbrepo.RepoSlug, States, Types, Priorities)
 			if err != nil {
 				logging.Error(err)
 			}
@@ -87,6 +101,8 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		},
 	}
 	listCmd.Flags().StringArrayVar(&States, "state", []string{"new", "open"}, "Filter by state: {new|open|resolved|on hold|invalid|duplicate|wontfix|closed|all}")
+	listCmd.Flags().StringArrayVar(&Types, "type", []string{"all"}, "Filter by type/kind: {bug|enhancement|proposal|task|all}")
+	listCmd.Flags().StringArrayVar(&Priorities, "priority", []string{"all"}, "Filter by priority: {trivial|minor|major|critical|blocker}")
 	listCmd.Flags().BoolVar(&Web, "web", false, "view issues in your browser")
 	issueCmd.AddCommand(listCmd)
 }

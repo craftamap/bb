@@ -85,7 +85,7 @@ type Change struct {
 	Old string `mapstructure:"old"`
 }
 
-func (c Client) IssuesList(repoOrga string, repoSlug string, states []string) (*ListIssues, error) {
+func (c Client) IssuesList(repoOrga string, repoSlug string, states []string, types []string, priorities []string) (*ListIssues, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 	var query strings.Builder
 	query.WriteString("(")
@@ -94,6 +94,32 @@ func (c Client) IssuesList(repoOrga string, repoSlug string, states []string) (*
 		query.WriteString(state)
 		query.WriteString("\" ")
 		if i != len(states)-1 {
+			query.WriteString("OR ")
+		}
+	}
+	query.WriteString(")")
+
+	query.WriteString(" AND ")
+
+	query.WriteString("(")
+	for i, typus := range types {
+		query.WriteString("kind = \"")
+		query.WriteString(typus)
+		query.WriteString("\" ")
+		if i != len(types)-1 {
+			query.WriteString("OR ")
+		}
+	}
+	query.WriteString(")")
+
+	query.WriteString(" AND ")
+
+	query.WriteString("(")
+	for i, priority := range priorities {
+		query.WriteString("priority = \"")
+		query.WriteString(priority)
+		query.WriteString("\" ")
+		if i != len(priorities)-1 {
 			query.WriteString("OR ")
 		}
 	}
