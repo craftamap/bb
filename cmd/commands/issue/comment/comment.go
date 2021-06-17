@@ -54,10 +54,14 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			fmt.Print(out)
 
 			var confirmation bool
-			survey.AskOne(&survey.Confirm{
+			err = survey.AskOne(&survey.Confirm{
 				Message: "Do you want to comment this?",
 				Default: true,
 			}, &confirmation)
+			if err != nil {
+				logging.Error(err)
+				return
+			}
 
 			if !confirmation {
 				return

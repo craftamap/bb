@@ -42,8 +42,8 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				logging.Error(err, response)
 				return
 			}
-			logging.Success(fmt.Sprintf("issue %d deleted", id))
 
+			logging.Success(fmt.Sprintf("issue %d deleted", id))
 		},
 	}
 	issueCmd.AddCommand(deleteCmd)
