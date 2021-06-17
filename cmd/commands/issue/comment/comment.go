@@ -31,12 +31,15 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			c := globalOpts.Client
 			bbrepo := globalOpts.BitbucketRepo
 
-			if len(args) > 0 {
+			if len(args) == 1 {
 				id, err = strconv.Atoi(strings.TrimPrefix(args[0], "#"))
 				if err != nil {
 					logging.Error(err)
 					return
 				}
+			} else {
+				logging.Error("Wrong number of arguments, see --help")
+				return
 			}
 
 			body, err := surveyext.Edit("vim", "bb-issuecomment*.md", "", os.Stdin, os.Stdout, os.Stderr, nil)

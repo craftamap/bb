@@ -26,12 +26,15 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			c := globalOpts.Client
 			bbrepo := globalOpts.BitbucketRepo
 
-			if len(args) > 0 {
+			if len(args) == 1 {
 				id, err = strconv.Atoi(strings.TrimPrefix(args[0], "#"))
 				if err != nil {
 					logging.Error(err)
 					return
 				}
+			} else {
+				logging.Error("Wrong number of arguments, see --help")
+				return
 			}
 
 			response, err := c.IssuesDelete(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
