@@ -20,9 +20,10 @@ const (
 
 func Add(pipelinesCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	listCmd := &cobra.Command{
-		Use:   "list",
-		Short: "List pipeline executions this repository",
-		Long:  "List pipeline executions this repository",
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "List pipeline executions this repository",
+		Long:    "List pipeline executions this repository",
 		Annotations: map[string]string{
 			"RequiresClient":     "true",
 			"RequiresRepository": "true",

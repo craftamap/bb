@@ -18,7 +18,8 @@ var (
 
 func Add(downloadsCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	listCmd := &cobra.Command{
-		Use: "list",
+		Use:     "list",
+		Aliases: []string{"ls"},
 		Annotations: map[string]string{
 			"RequiresClient":     "true",
 			"RequiresRepository": "true",
