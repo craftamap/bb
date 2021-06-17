@@ -76,7 +76,7 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				default:
 					state = issue.State
 				}
-				fmt.Printf("#%03d %s  %s\n", aurora.Green(issue.ID), state, issue.Title)
+				fmt.Printf("#%03d %s  %s   %s\n", aurora.Green(issue.ID), state, issue.Title, aurora.Index(242, fmt.Sprintf("by %s", issue.Reporter.DisplayName)))
 			}
 		},
 	}
