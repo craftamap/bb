@@ -58,21 +58,21 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				var state string
 				switch issue.State {
 				case "new":
-					state = aurora.BgIndex(55, "    NEW    ").String()
+					state = aurora.BgIndex(55, " NEW ").String() + "     "
 				case "open":
-					state = aurora.BgGray(12, "   OPEN    ").String()
+					state = aurora.BgGray(12, " OPEN ").String() + "    "
 				case "on hold":
-					state = aurora.BgBlue("  ON HOLD  ").String()
+					state = aurora.BgBlue(" ON HOLD ").String() + "  "
 				case "invalid":
-					state = aurora.BgRed("  INVALID  ").String()
+					state = aurora.BgRed(" INVALID ").String() + "  "
 				case "resolved":
-					state = aurora.BgGreen(" RESOLVED  ").String()
+					state = aurora.BgGreen(" RESOLVED ").String()
 				case "duplicate":
 					state = aurora.BgYellow(" DUPLICATE ").String()
 				case "wontfix":
-					state = aurora.BgRed("  WONTFIX  ").String()
+					state = aurora.BgRed(" WONTFIX ").String() + "  "
 				case "closed":
-					state = aurora.BgGreen("  CLOSED   ").String()
+					state = aurora.BgGreen(" CLOSED ").String() + "   "
 				default:
 					state = issue.State
 				}
