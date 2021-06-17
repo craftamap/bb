@@ -8,7 +8,6 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
-	"github.com/wbrefvem/go-bitbucket"
 )
 
 var (
@@ -35,8 +34,8 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					logging.Error(err)
 				}
 
-				linkWrapper := repo.Links["Html"].(*bitbucket.SubjectTypesRepositoryEvents)
-				link := linkWrapper.Href + "/issues"
+				linkBase := repo.Links["html"].(map[string]interface{})["href"].(string)
+				link := linkBase + "/issues"
 				err = browser.OpenURL(link)
 				if err != nil {
 					logging.Error(err)
