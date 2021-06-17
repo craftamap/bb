@@ -108,6 +108,14 @@ repository in the browser by using `bb repo view --web`.
 
 ![A repo in all its beauty](.github/screencast_repo_view.gif)
 
+### Issues
+
+If you have the native bitbucket issues enabled in your project, you can list 
+all open issues by typing `bb issue list`. You can also create new ones using
+`bb issue create`, update existing ones using `bb issue update <id>`, delete 
+and view existing ones with `bb issue delete <id>` and `bb issue view <id>` and
+comment them using `bb issue comment <id>`.
+
 ## Development
 ### Used Libraries
 
