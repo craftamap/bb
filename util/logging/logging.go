@@ -23,7 +23,7 @@ func Debugf(message ...interface{}) {
 }
 
 func Error(message ...interface{}) {
-	fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), message)
+	fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), fmt.Sprint(message...))
 }
 
 func Warning(message ...interface{}) {
@@ -39,5 +39,5 @@ func Success(message ...interface{}) {
 }
 
 func SuccessExclamation(message ...interface{}) {
-	fmt.Printf("%s%s", aurora.Bold(aurora.Green("! ")), aurora.Bold(fmt.Sprint(message...)))
+	fmt.Printf("%s%s\n", aurora.Bold(aurora.Green("! ")), aurora.Bold(fmt.Sprint(message...)))
 }
