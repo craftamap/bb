@@ -2,6 +2,7 @@ package list
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/craftamap/bb/util/logging"
@@ -45,6 +46,12 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 
+			for _, state := range States {
+				if strings.ToUpper(state) == "ALL" {
+					States = []string{"new", "open", "resolved", "on hold", "invalid", "duplicate", "wontfix", "closed"}
+				}
+			}
+
 			issues, err := c.IssuesList(bbrepo.RepoOrga, bbrepo.RepoSlug, States)
 			if err != nil {
 				logging.Error(err)
@@ -79,7 +86,7 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 		},
 	}
-	listCmd.Flags().StringArrayVar(&States, "states", []string{"new", "open", "resolved", "invalid", "duplicate", "wontfix"}, "Filter by state: {new|open|resolved|on hold|invalid|duplicate|wontfix|closed}")
+	listCmd.Flags().StringArrayVar(&States, "state", []string{"new", "open"}, "Filter by state: {new|open|resolved|on hold|invalid|duplicate|wontfix|closed|all}")
 	listCmd.Flags().BoolVar(&Web, "web", false, "view issues in your browser")
 	issueCmd.AddCommand(listCmd)
 }
