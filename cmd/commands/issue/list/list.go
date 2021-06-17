@@ -20,9 +20,10 @@ var (
 
 func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	listCmd := &cobra.Command{
-		Use:   "list",
-		Short: "List and filter issues in this repository",
-		Long:  "List and filter issues in this repository",
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "List and filter issues in this repository",
+		Long:    "List and filter issues in this repository",
 		Annotations: map[string]string{
 			"RequiresClient":     "true",
 			"RequiresRepository": "true",
