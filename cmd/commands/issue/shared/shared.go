@@ -113,8 +113,8 @@ func AskQuestionsForCreateOrUpdate(io IssueOptions, bbrepo *bbgit.BitbucketRepo,
 			continue
 		}
 	}
-	return io, nil, false
 
+	return io, nil, false
 }
 
 func modifyDescription(body string) (string, error) {
@@ -170,7 +170,7 @@ func selectAssignee(bbrepo *bbgit.BitbucketRepo, c *client.Client, assignee stri
 	nameToUUID["(No Assignee)"] = ""
 
 	err = survey.AskOne(&survey.Select{
-		Message:  "Which user do you wnat to assign?",
+		Message:  "Which user do you want to assign?",
 		Options:  listOfNames,
 		PageSize: 20,
 	}, &assigneeName)
