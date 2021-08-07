@@ -137,6 +137,7 @@ func initConfig() {
 
 	viper.SetConfigFile(cfgFile)
 
+	viper.SetEnvPrefix("bb")
 	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()
