@@ -71,7 +71,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			err = processCmdQueue(cmdQueue)
 			if err != nil {
 				logging.Error(err)
-				logging.Note("Looks like an error occured - you probably need to resolve the conflict manually now. Start by running " + aurora.BgBrightBlack(aurora.White(" git status ")).String() + " to get hints on how to resolve the conflicts.")
+				logging.Note("Looks like an error occurred - you probably need to resolve the conflict manually now. Start by running " + aurora.BgBrightBlack(aurora.White(" git status ")).String() + " to get hints on how to resolve the conflicts.")
 				cancelCommand := aurora.BgBrightBlack(aurora.White(" git merge --abort ")).String()
 				if Rebase {
 					cancelCommand = aurora.BgBrightBlack(aurora.White(" git rebase --abort ")).String()
