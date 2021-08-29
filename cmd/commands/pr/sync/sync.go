@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/cli/cli/git"
 	"github.com/cli/cli/utils"
@@ -23,7 +24,7 @@ var (
 
 const (
 	MethodOptionMerge  = "merge"
-	MethodOptionRebase = "Rebase"
+	MethodOptionRebase = "rebase"
 )
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
@@ -39,14 +40,18 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			// In order to check if the method exists in the config, we need to check here
 			syncMethodIsSet := viper.IsSet("sync-method")
 			if !syncMethodIsSet {
-				logging.Note("You can configure your preferred way of syncing by running TODO")
+				logging.Note(
+					"You can configure your preferred way of syncing by adding the following line to your configuration: ",
+					aurora.BgBrightBlack(aurora.White(" sync-method = merge ")).String(),
+					" or ",
+					aurora.BgBrightBlack(aurora.White(" sync-method = rebase ")).String(),
+				)
 			}
-			if !cmd.Flags().Lookup("method").Changed {
+			if syncMethodIsSet && !cmd.Flags().Lookup("method").Changed {
 				Method = viper.GetString("sync-method")
 			}
 
 			if Method != MethodOptionRebase && Method != MethodOptionMerge {
-				logging.Error("\"%s\" is not a valid method (select one of these: %s, %s)", Method, MethodOptionRebase, MethodOptionMerge)
 				return fmt.Errorf("\"%s\" is not a valid method (select one of these: %s, %s)", Method, MethodOptionRebase, MethodOptionMerge)
 			}
 			return nil
@@ -70,7 +75,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 			if len(prs.Values) == 0 {
-				logging.Warning("Nothing on this branch")
+				logging.Error("No pull request on this branch")
 				return
 			}
 			id = prs.Values[0].ID
@@ -81,7 +86,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 			if ucc, err := git.UncommittedChangeCount(); err == nil && ucc > 0 {
-				logging.Warning(utils.Pluralize(ucc, "uncommitted change; This might lead to issues"))
+				logging.Warning(utils.Pluralize(ucc, "uncommitted change"), "; This might lead to issues")
 			}
 
 			remoteDestinationBranch := fmt.Sprintf("origin/%s", pr.Destination.Branch.Name)
@@ -93,6 +98,17 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			} else {
 				cmdQueue = append(cmdQueue, []string{"git", "merge", "--commit", remoteDestinationBranch})
 			}
+
+			var builder strings.Builder
+			for _, cmd := range cmdQueue {
+				builder.WriteString("	")
+				for _, cmdPart := range cmd {
+					builder.WriteString(cmdPart)
+					builder.WriteString(" ")
+				}
+				builder.WriteString("\n")
+			}
+			logging.Note(fmt.Sprintf("Syncing by running the following commands: \n%v", builder.String()))
 
 			err = processCmdQueue(cmdQueue)
 			if err != nil {
