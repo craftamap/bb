@@ -36,6 +36,7 @@ var (
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			username := viper.GetString("username")
 			password := viper.GetString("password")
+			remoteName := viper.GetString("remote")
 
 			if _, ok := cmd.Annotations["RequiresRepository"]; ok {
 				bbrepo, err := bbgit.GetBitbucketRepo(remoteName)
@@ -86,7 +87,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/bb)")
 	rootCmd.PersistentFlags().StringVar(&username, "username", "", "username")
 	rootCmd.PersistentFlags().StringVar(&password, "password", "", "app password")
-	rootCmd.PersistentFlags().StringVar(&remoteName, "remote", "origin", "if you are in a repository and don't want to interact with the default origin, you can change it")
+	rootCmd.PersistentFlags().StringVar(&remoteName, "remote", "", "if you are in a repository and don't want to interact with the default origin, you can change it")
 	rootCmd.PersistentFlags().BoolVar(&logging.PrintDebugLogs, "debug", false, "enabling this flag allows debug logs to be printed")
 
 	err := viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
@@ -95,6 +96,12 @@ func init() {
 		return
 	}
 	err = viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
+	if err != nil {
+		logging.Error(err)
+		return
+	}
+
+	err = viper.BindPFlag("remote", rootCmd.PersistentFlags().Lookup("remote"))
 	if err != nil {
 		logging.Error(err)
 		return
