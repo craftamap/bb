@@ -49,7 +49,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			newBranchName := pr.Source.Branch.Name
 			// for now, we do not support prs from other repositories
-			remoteBranch := fmt.Sprintf("origin/%s", newBranchName)
+			remoteBranch := fmt.Sprintf("%s/%s", bbrepo.Remote.Name, newBranchName)
 
 			var cmdQueue [][]string
 
@@ -58,7 +58,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				cmdQueue = append(cmdQueue, []string{"git", "merge", "--ff-only", fmt.Sprintf("refs/remotes/%s", remoteBranch)})
 			} else {
 				cmdQueue = append(cmdQueue, []string{"git", "checkout", "-b", newBranchName, "--no-track", remoteBranch})
-				cmdQueue = append(cmdQueue, []string{"git", "config", fmt.Sprintf("branch.%s.remote", newBranchName), "origin"})
+				cmdQueue = append(cmdQueue, []string{"git", "config", fmt.Sprintf("branch.%s.remote", newBranchName), bbrepo.Remote.Name})
 				cmdQueue = append(cmdQueue, []string{"git", "config", fmt.Sprintf("branch.%s.merge", newBranchName), "refs/heads/" + newBranchName})
 			}
 

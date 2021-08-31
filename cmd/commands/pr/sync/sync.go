@@ -30,7 +30,7 @@ const (
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	syncCmd := &cobra.Command{
 		Use:   "sync",
-		Long:  "synchronizes the current pull request with new changes in it's destination branch by either merging or rebasing the changes locally. If the rebase or merge fails because of an conflict, the merge must be resolved manually.",
+		Long:  "synchronizes the current pull request with new changes in it's destination branch by either merging or rebasing the changes locally. If rebasing or merging fails because of an conflict, the merge must be resolved manually.",
 		Short: "Sync a pull request locally",
 		Annotations: map[string]string{
 			"RequiresClient":     "true",
@@ -89,10 +89,12 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				logging.Warning(utils.Pluralize(ucc, "uncommitted change"), "; This might lead to issues")
 			}
 
-			remoteDestinationBranch := fmt.Sprintf("origin/%s", pr.Destination.Branch.Name)
+			remoteName := bbrepo.Remote.Name
+
+			remoteDestinationBranch := fmt.Sprintf("%s/%s", remoteName, pr.Destination.Branch.Name)
 
 			var cmdQueue [][]string
-			cmdQueue = append(cmdQueue, []string{"git", "fetch", "origin", pr.Destination.Branch.Name})
+			cmdQueue = append(cmdQueue, []string{"git", "fetch", remoteName, pr.Destination.Branch.Name})
 			if Method == MethodOptionRebase {
 				cmdQueue = append(cmdQueue, []string{"git", "rebase", remoteDestinationBranch})
 			} else {
