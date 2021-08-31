@@ -63,7 +63,8 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			viper.Set("username", answers.Username)
 			viper.Set("password", answers.Password)
-
+			
+			// TODO: fix
 			err = viper.WriteConfig()
 			if err != nil {
 				logging.Error(err)

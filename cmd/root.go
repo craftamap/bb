@@ -10,6 +10,7 @@ import (
 	"github.com/craftamap/bb/client"
 	"github.com/craftamap/bb/cmd/commands/api"
 	"github.com/craftamap/bb/cmd/commands/auth"
+	"github.com/craftamap/bb/cmd/commands/config"
 	"github.com/craftamap/bb/cmd/commands/downloads"
 	"github.com/craftamap/bb/cmd/commands/issue"
 	"github.com/craftamap/bb/cmd/commands/pipelines"
@@ -106,6 +107,7 @@ func init() {
 	auth.Add(rootCmd, &globalOpts)
 	repo.Add(rootCmd, &globalOpts)
 	pipelines.Add(rootCmd, &globalOpts)
+	config.Add(rootCmd, &globalOpts)
 
 	if CommitSHA != "" {
 		vt := rootCmd.VersionTemplate()

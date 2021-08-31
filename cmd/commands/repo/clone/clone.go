@@ -35,6 +35,7 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					return
 				}
 				viper.Set("git_protocol", gitProtocol)
+				// TODO: fix
 				viper.WriteConfig()
 			}
 
