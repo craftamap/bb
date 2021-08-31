@@ -119,30 +119,55 @@ func init() {
 }
 
 func initConfig() {
-	if cfgFile == "" {
-		configDir := configdir.LocalConfig("bb")
-		err := configdir.MakePath(configDir)
+	viper.SetEnvPrefix("bb")
+	viper.AutomaticEnv()
+
+	// We support setting the config file manually by running bb with --config.
+	if cfgFile != "" {
+		viper.SetConfigFile(cfgFile)
+		err := viper.ReadInConfig()
+		if err != nil { // Handle errors reading the config file
+			panic(fmt.Errorf("fatal error config file: %s", err))
+		}
+	} else {
+		// create global config directory, first
+		configDirectory := configdir.LocalConfig("bb")
+		err := configdir.MakePath(configDirectory)
 		if err != nil {
 			panic(err)
 		}
-		cfgFile = filepath.Join(configDir, "configuration.toml")
-		if _, err = os.Stat(cfgFile); os.IsNotExist(err) {
-			fh, err := os.Create(cfgFile)
+		globalConfigFilePath := filepath.Join(configDirectory, "configuration.toml")
+		// create global config directory, first
+		if _, err = os.Stat(globalConfigFilePath); os.IsNotExist(err) {
+			fh, err := os.Create(globalConfigFilePath)
 			if err != nil {
 				panic(err)
 			}
 			defer fh.Close()
 		}
+		viper.SetConfigType("toml")
+		viper.SetConfigName("configuration.toml")
+		viper.AddConfigPath(configDirectory)
+		err = viper.ReadInConfig()
+		if err != nil { // Handle errors reading the config file
+			panic(fmt.Errorf("fatal error config file: %s", err))
+		}
+
+		// also read in local configuration
+		if repoPath, err := bbgit.RepoPath(); err == nil {
+			// the local configuration can be found in the root of a repository
+			// If we in a repository, check for the file
+			if _, err = os.Stat(filepath.Join(repoPath, ".bb")); err == nil {
+				viper.SetConfigType("toml")
+				viper.SetConfigName(".bb")
+				viper.AddConfigPath(repoPath)
+				err = viper.MergeInConfig()
+				if err != nil { // Handle errors reading the config file
+					panic(fmt.Errorf("fatal error config file: %s", err))
+				}
+			}
+		}
 	}
+	logging.Debugf("%+v", viper.AllSettings())
 
-	viper.SetConfigFile(cfgFile)
-
-	viper.SetEnvPrefix("bb")
-	viper.AutomaticEnv()
-
-	err := viper.ReadInConfig()
-
-	if err != nil { // Handle errors reading the config file
-		panic(fmt.Errorf("fatal error config file: %s", err))
-	}
 }
