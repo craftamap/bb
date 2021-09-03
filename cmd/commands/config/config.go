@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/craftamap/bb/cmd/options"
+	"github.com/craftamap/bb/config"
 	bbgit "github.com/craftamap/bb/git"
 	"github.com/craftamap/bb/util/logging"
 	"github.com/kirsle/configdir"
@@ -37,6 +38,16 @@ func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
 			if Get {
 				// TODO: code here
 			} else {
+				key := args[0]
+				inputValue := args[1]
+				
+				newValue, err := config.BbConfigurationValidation.ValidateEntry(key, inputValue)
+
+				if err != nil {
+					logging.Error(fmt.Sprintf("failed to validate %s: %s", inputValue, err))
+					return
+				}
+
 				var configDirectory string
 				var filename string
 				if Local {
@@ -74,9 +85,6 @@ func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
 				tmpVp.SetConfigType("toml")
 				tmpVp.SetConfigFile(path)
 				tmpVp.ReadInConfig()
-
-				key := args[0]
-				newValue := args[1]
 
 				isSetAlready := tmpVp.IsSet(key)
 				oldValue := tmpVp.Get(key)
@@ -122,7 +130,6 @@ func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
 					return
 				}
 
-
 				logging.SuccessExclamation(fmt.Sprintf("Successfully updated configuration %s", path))
 			}
 		},
@@ -137,7 +144,7 @@ func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
 func copyFileContent(src string, dst string) error {
 	sourceFileStat, err := os.Stat(src)
 	if err != nil {
-		return  err
+		return err
 	}
 
 	if !sourceFileStat.Mode().IsRegular() {
