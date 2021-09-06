@@ -2,8 +2,10 @@ package clone
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
+	"github.com/craftamap/bb/config"
 	"github.com/craftamap/bb/util/logging"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -34,9 +36,24 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					logging.Error(err)
 					return
 				}
-				viper.Set("git_protocol", gitProtocol)
-				// TODO: fix
-				viper.WriteConfig()
+
+				configDirectory, filename := config.GetGlobalConfigurationPath()
+				path := filepath.Join(configDirectory, filename)
+				// TODO: extract tmpVp stuff to a seperate file
+				tmpVp := viper.New()
+				tmpVp.SetConfigType("toml")
+				tmpVp.SetConfigFile(path)
+				tmpVp.ReadInConfig()
+
+				gitProtocolI, err := config.BbConfigurationValidation.ValidateEntry("git_protocol", gitProtocol)
+				if err != nil {
+					logging.Error(err)
+					return
+				}
+				gitProtocol = gitProtocolI.(string)
+
+				tmpVp.Set("git_protocol", gitProtocol)
+				tmpVp.WriteConfig()
 			}
 
 			if len(args) == 0 {

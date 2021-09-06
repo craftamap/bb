@@ -10,9 +10,7 @@ import (
 
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/craftamap/bb/config"
-	bbgit "github.com/craftamap/bb/git"
 	"github.com/craftamap/bb/util/logging"
-	"github.com/kirsle/configdir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -52,13 +50,13 @@ func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
 				var filename string
 				if Local {
 					var err error
-					configDirectory, filename, err = GetLocalConfigurationPath()
+					configDirectory, filename, err = config.GetLocalConfigurationPath()
 					if err != nil {
 						logging.Error(err)
 						return
 					}
 				} else {
-					configDirectory, filename = GetGlobalConfigurationPath()
+					configDirectory, filename = config.GetGlobalConfigurationPath()
 				}
 
 				// If the directory does not exist, something is off:
@@ -164,15 +162,4 @@ func copyFileContent(src string, dst string) error {
 	defer destination.Close()
 	_, err = io.Copy(destination, source)
 	return err
-}
-
-// TODO: Extract to util
-func GetGlobalConfigurationPath() (configDirectory string, filename string) {
-	configDirectory = configdir.LocalConfig("bb")
-	return configDirectory, "configuration.toml"
-}
-
-func GetLocalConfigurationPath() (configDirectory, filename string, err error) {
-	configDirectory, err = bbgit.RepoPath()
-	return configDirectory, ".bb", err
 }

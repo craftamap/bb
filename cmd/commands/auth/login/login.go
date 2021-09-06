@@ -2,7 +2,9 @@ package login
 
 import (
 	"fmt"
+	"path/filepath"
 
+	"github.com/craftamap/bb/config"
 	"github.com/craftamap/bb/util/logging"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -15,11 +17,19 @@ import (
 func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	loginCmd := &cobra.Command{
 		Use: "login",
-		Run: func(cmd *cobra.Command, args []string) {
-			oldPw := viper.GetString("password")
+		Run: func(_ *cobra.Command, _ []string) {
+			configDirectory, filename := config.GetGlobalConfigurationPath()
+			path := filepath.Join(configDirectory, filename)
+			// TODO: extract tmpVp stuff to a seperate file
+			tmpVp := viper.New()
+			tmpVp.SetConfigType("toml")
+			tmpVp.SetConfigFile(path)
+			tmpVp.ReadInConfig()
+
+			oldPw := tmpVp.GetString("password")
 
 			if oldPw != "" {
-				fmt.Println(aurora.Yellow("::"), aurora.Bold("Warning:"), "You are already logged in as", viper.GetString("username"))
+				logging.Warning("You are already logged in as ", tmpVp.GetString("username"))
 				cont := false
 				err := survey.AskOne(&survey.Confirm{Message: "Do you want to overwrite this?"}, &cont)
 				if err != nil {
@@ -60,18 +70,27 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				logging.Error(err)
 				return
 			}
-
-			viper.Set("username", answers.Username)
-			viper.Set("password", answers.Password)
-			
-			// TODO: fix
-			err = viper.WriteConfig()
+			username, err := config.BbConfigurationValidation.ValidateEntry("username", answers.Username)
+			if err != nil {
+				logging.Error(err)
+				return
+			}
+			password, err := config.BbConfigurationValidation.ValidateEntry("password", answers.Password)
 			if err != nil {
 				logging.Error(err)
 				return
 			}
 
-			logging.Success(fmt.Sprint("Stored credentials successfully to", viper.ConfigFileUsed()))
+			tmpVp.Set("username", username)
+			tmpVp.Set("password", password)
+
+			err = tmpVp.WriteConfig()
+			if err != nil {
+				logging.Error(err)
+				return
+			}
+
+			logging.Success(fmt.Sprint("Stored credentials successfully to", tmpVp.ConfigFileUsed()))
 		},
 	}
 
