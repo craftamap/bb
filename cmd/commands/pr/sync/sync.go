@@ -10,6 +10,7 @@ import (
 	"github.com/cli/cli/utils"
 	"github.com/cli/safeexec"
 	"github.com/craftamap/bb/cmd/options"
+	"github.com/craftamap/bb/config"
 	"github.com/craftamap/bb/internal/run"
 	"github.com/craftamap/bb/util/logging"
 	"github.com/logrusorgru/aurora"
@@ -38,7 +39,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		},
 		PreRunE: func(cmd *cobra.Command, _ []string) error {
 			// In order to check if the method exists in the config, we need to check here
-			syncMethodIsSet := viper.IsSet("sync-method")
+			syncMethodIsSet := viper.IsSet(config.CONFIG_KEY_PR_SYNC_SYNC_METHOD)
 			if !syncMethodIsSet {
 				logging.Note(
 					"You can configure your preferred way of syncing by adding the following line to your configuration: ",
@@ -48,7 +49,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				)
 			}
 			if syncMethodIsSet && !cmd.Flags().Lookup("method").Changed {
-				Method = viper.GetString("sync-method")
+				Method = viper.GetString(config.CONFIG_KEY_PR_SYNC_SYNC_METHOD)
 			}
 
 			if Method != MethodOptionRebase && Method != MethodOptionMerge {

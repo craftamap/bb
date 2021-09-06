@@ -17,6 +17,7 @@ import (
 	"github.com/craftamap/bb/cmd/commands/pr"
 	"github.com/craftamap/bb/cmd/commands/repo"
 	"github.com/craftamap/bb/cmd/options"
+	configuration "github.com/craftamap/bb/config"
 	bbgit "github.com/craftamap/bb/git"
 	"github.com/kirsle/configdir"
 	"github.com/logrusorgru/aurora"
@@ -34,9 +35,9 @@ var (
 		Long:    "Work seamlessly with Bitbucket.org from the command line.",
 		Example: `$ bb pr list`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			username := viper.GetString("username")
-			password := viper.GetString("password")
-			remoteName := viper.GetString("remote")
+			username := viper.GetString(configuration.CONFIG_KEY_AUTH_USERNAME)
+			password := viper.GetString(configuration.CONFIG_KEY_AUTH_PASSWORD)
+			remoteName := viper.GetString(configuration.CONFIG_KEY_GIT_REMOTE)
 
 			if _, ok := cmd.Annotations["RequiresRepository"]; ok {
 				bbrepo, err := bbgit.GetBitbucketRepo(remoteName)
@@ -87,21 +88,21 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/bb)")
 	rootCmd.PersistentFlags().StringVar(&username, "username", "", "username")
 	rootCmd.PersistentFlags().StringVar(&password, "password", "", "app password")
-	rootCmd.PersistentFlags().StringVar(&remoteName, "remote", "", "if you are in a repository and don't want to interact with the default origin, you can change it")
+	rootCmd.PersistentFlags().StringVar(&remoteName, "remote", "origin", "if you are in a repository and don't want to interact with the default remote, you can change it")
 	rootCmd.PersistentFlags().BoolVar(&logging.PrintDebugLogs, "debug", false, "enabling this flag allows debug logs to be printed")
 
-	err := viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
+	err := viper.BindPFlag(configuration.CONFIG_KEY_AUTH_USERNAME, rootCmd.PersistentFlags().Lookup("username"))
 	if err != nil {
 		logging.Error(err)
 		return
 	}
-	err = viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
+	err = viper.BindPFlag(configuration.CONFIG_KEY_AUTH_PASSWORD, rootCmd.PersistentFlags().Lookup("password"))
 	if err != nil {
 		logging.Error(err)
 		return
 	}
 
-	err = viper.BindPFlag("remote", rootCmd.PersistentFlags().Lookup("remote"))
+	err = viper.BindPFlag(configuration.CONFIG_KEY_GIT_REMOTE, rootCmd.PersistentFlags().Lookup("remote"))
 	if err != nil {
 		logging.Error(err)
 		return
@@ -177,6 +178,14 @@ func initConfig() {
 			}
 		}
 	}
+
+	// Register Aliases for backward compability
+	viper.RegisterAlias("username", configuration.CONFIG_KEY_AUTH_USERNAME)
+	viper.RegisterAlias("password", configuration.CONFIG_KEY_AUTH_PASSWORD)
+	viper.RegisterAlias("remote", configuration.CONFIG_KEY_GIT_REMOTE)
+	viper.RegisterAlias("git_protocol", configuration.CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL)
+	viper.RegisterAlias("sync-method", configuration.CONFIG_KEY_PR_SYNC_SYNC_METHOD)
+
 	logging.Debugf("%+v", viper.AllSettings())
 
 }

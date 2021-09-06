@@ -60,20 +60,29 @@ func (c Configuration) ValidateEntry(key string, value interface{}) (interface{}
 	return e.Validator(value)
 }
 
+const (
+	CONFIG_KEY_AUTH_USERNAME = "auth.username"
+	CONFIG_KEY_AUTH_PASSWORD = "auth.password"
+	CONFIG_KEY_GIT_REMOTE = "git.remote"
+	CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL = "repo.clone.git_protocol"
+	CONFIG_KEY_PR_SYNC_SYNC_METHOD = "pr.sync.sync_method"
+)
+
+
 var BbConfigurationValidation Configuration = map[string]Entry{
-	"username": {
+	CONFIG_KEY_AUTH_USERNAME: {
 		Validator: SimpleStringValidator(),
 	},
-	"password": {
+	CONFIG_KEY_AUTH_PASSWORD: {
 		Validator: SimpleStringValidator(),
 	},
-	"remote": {
+	CONFIG_KEY_GIT_REMOTE: {
 		Validator: SimpleStringValidator(),
 	},
-	"git_protocol": {
+	CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL: {
 		Validator: EnumValidator("ssh", "https"),
 	},
-	"sync-method": {
+	CONFIG_KEY_PR_SYNC_SYNC_METHOD: {
 		Validator: EnumValidator("merge", "rebase"),
 	},
 }

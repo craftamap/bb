@@ -26,7 +26,7 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		Run: func(cmd *cobra.Command, args []string) {
 			c := globalOpts.Client
 
-			gitProtocol := viper.GetString("git_protocol")
+			gitProtocol := viper.GetString(config.CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL)
 			if gitProtocol == "" || (gitProtocol != "ssh" && gitProtocol != "https") {
 				err := survey.AskOne(&survey.Select{
 					Message: "Please select a prefered protocol of cloning repositories",
@@ -45,14 +45,14 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				tmpVp.SetConfigFile(path)
 				tmpVp.ReadInConfig()
 
-				gitProtocolI, err := config.BbConfigurationValidation.ValidateEntry("git_protocol", gitProtocol)
+				gitProtocolI, err := config.BbConfigurationValidation.ValidateEntry(config.CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL, gitProtocol)
 				if err != nil {
 					logging.Error(err)
 					return
 				}
 				gitProtocol = gitProtocolI.(string)
 
-				tmpVp.Set("git_protocol", gitProtocol)
+				tmpVp.Set(config.CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL, gitProtocol)
 				tmpVp.WriteConfig()
 			}
 

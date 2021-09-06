@@ -26,10 +26,10 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			tmpVp.SetConfigFile(path)
 			tmpVp.ReadInConfig()
 
-			oldPw := tmpVp.GetString("password")
+			oldPw := tmpVp.GetString(config.CONFIG_KEY_AUTH_PASSWORD)
 
 			if oldPw != "" {
-				logging.Warning("You are already logged in as ", tmpVp.GetString("username"))
+				logging.Warning("You are already logged in as ", tmpVp.GetString(config.CONFIG_KEY_AUTH_USERNAME))
 				cont := false
 				err := survey.AskOne(&survey.Confirm{Message: "Do you want to overwrite this?"}, &cont)
 				if err != nil {
@@ -70,19 +70,19 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				logging.Error(err)
 				return
 			}
-			username, err := config.BbConfigurationValidation.ValidateEntry("username", answers.Username)
+			username, err := config.BbConfigurationValidation.ValidateEntry(config.CONFIG_KEY_AUTH_USERNAME, answers.Username)
 			if err != nil {
 				logging.Error(err)
 				return
 			}
-			password, err := config.BbConfigurationValidation.ValidateEntry("password", answers.Password)
+			password, err := config.BbConfigurationValidation.ValidateEntry(config.CONFIG_KEY_AUTH_PASSWORD, answers.Password)
 			if err != nil {
 				logging.Error(err)
 				return
 			}
 
-			tmpVp.Set("username", username)
-			tmpVp.Set("password", password)
+			tmpVp.Set(config.CONFIG_KEY_AUTH_USERNAME, username)
+			tmpVp.Set(config.CONFIG_KEY_AUTH_PASSWORD, password)
 
 			err = tmpVp.WriteConfig()
 			if err != nil {
