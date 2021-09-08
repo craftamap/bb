@@ -96,12 +96,14 @@ func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
 				logging.Note(fmt.Sprintf("Setting \"%s\" to \"%s\" in %s", key, newValue, path))
 				logging.Debugf("%+v", tmpVp.AllSettings())
 
-				// This will most likely save everything as a string
-				// TODO: find this out and find a way to save bools and numbers
 				tmpVp.Set(key, newValue)
 				logging.Debugf("%+v", tmpVp.AllSettings())
 
-				config.WriteViper(tmpVp, path)
+				err = config.WriteViper(tmpVp, path)
+				if err != nil {
+					logging.Error(err)
+					return
+				}
 
 				logging.SuccessExclamation(fmt.Sprintf("Successfully updated configuration %s", path))
 			}
