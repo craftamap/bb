@@ -11,20 +11,19 @@ import (
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
+func Add(authCmd *cobra.Command, _ *options.GlobalOptions) {
 	loginCmd := &cobra.Command{
 		Use: "login",
 		Run: func(_ *cobra.Command, _ []string) {
 			configDirectory, filename := config.GetGlobalConfigurationPath()
 			path := filepath.Join(configDirectory, filename)
-			// TODO: extract tmpVp stuff to a seperate file
-			tmpVp := viper.New()
-			tmpVp.SetConfigType("toml")
-			tmpVp.SetConfigFile(path)
-			tmpVp.ReadInConfig()
+			tmpVp, err := config.GetViperForPath(path)
+			if err != nil {
+				logging.Error(err)
+				return
+			}
 
 			oldPw := tmpVp.GetString(config.CONFIG_KEY_AUTH_PASSWORD)
 
@@ -51,7 +50,7 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				Password string
 			}{}
 
-			err := survey.Ask([]*survey.Question{
+			err = survey.Ask([]*survey.Question{
 				{
 					Name: "username",
 					Prompt: &survey.Input{
@@ -70,21 +69,12 @@ func Add(authCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				logging.Error(err)
 				return
 			}
-			username, err := config.BbConfigurationValidation.ValidateEntry(config.CONFIG_KEY_AUTH_USERNAME, answers.Username)
+			_, err = config.ValidateAndUpdateEntryWithViper(tmpVp, config.CONFIG_KEY_AUTH_USERNAME, answers.Username)
 			if err != nil {
 				logging.Error(err)
 				return
 			}
-			password, err := config.BbConfigurationValidation.ValidateEntry(config.CONFIG_KEY_AUTH_PASSWORD, answers.Password)
-			if err != nil {
-				logging.Error(err)
-				return
-			}
-
-			tmpVp.Set(config.CONFIG_KEY_AUTH_USERNAME, username)
-			tmpVp.Set(config.CONFIG_KEY_AUTH_PASSWORD, password)
-
-			err = tmpVp.WriteConfig()
+			_, err = config.ValidateAndUpdateEntryWithViper(tmpVp, config.CONFIG_KEY_AUTH_PASSWORD, answers.Password)
 			if err != nil {
 				logging.Error(err)
 				return

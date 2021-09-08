@@ -39,21 +39,11 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 				configDirectory, filename := config.GetGlobalConfigurationPath()
 				path := filepath.Join(configDirectory, filename)
-				// TODO: extract tmpVp stuff to a seperate file
-				tmpVp := viper.New()
-				tmpVp.SetConfigType("toml")
-				tmpVp.SetConfigFile(path)
-				tmpVp.ReadInConfig()
-
-				gitProtocolI, err := config.BbConfigurationValidation.ValidateEntry(config.CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL, gitProtocol)
+				_, err = config.ValidateAndUpdateEntry(path, config.CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL, gitProtocol)
 				if err != nil {
 					logging.Error(err)
 					return
 				}
-				gitProtocol = gitProtocolI.(string)
-
-				tmpVp.Set(config.CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL, gitProtocol)
-				tmpVp.WriteConfig()
 			}
 
 			if len(args) == 0 {
