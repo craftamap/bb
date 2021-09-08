@@ -64,7 +64,7 @@ func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
 					return
 				}
 				path := filepath.Join(configDirectory, filename)
-				// If the config itself does not exist, it's fine (although wierd for global) - we create it now
+				// If the config itself does not exist, it's fine (although weird for global) - we create it now
 				if _, err := os.Stat(path); os.IsNotExist(err) {
 					logging.Note(fmt.Sprintf("Creating config file %s", path))
 					fh, err := os.Create(path)

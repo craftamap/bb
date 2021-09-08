@@ -21,7 +21,7 @@ const (
 
 type Validator func(interface{}) (interface{}, error)
 
-// Enum is just a string of a list
+// Enum is just a string of a list.
 func EnumValidator(validValues ...string) Validator {
 	return func(inputValue interface{}) (interface{}, error) {
 		_, ok := inputValue.(string)
@@ -43,7 +43,7 @@ func EnumValidator(validValues ...string) Validator {
 	}
 }
 
-// SimpleStringValidator validates if a input is a "simple" string - only single-line strings are supported
+// SimpleStringValidator validates if a input is a "simple" string - only single-line strings are supported.
 func SimpleStringValidator() Validator {
 	return func(inputValue interface{}) (interface{}, error) {
 		_, ok := inputValue.(string)
@@ -59,7 +59,7 @@ func SimpleStringValidator() Validator {
 	}
 }
 
-// Entry contains all the data required for Validation and Convertion
+// Entry contains all the data required for Validation and Convertion.
 type Entry struct {
 	Validator Validator
 }

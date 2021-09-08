@@ -5,7 +5,6 @@ import (
 	"github.com/kirsle/configdir"
 )
 
-// TODO: Extract to util
 func GetGlobalConfigurationPath() (configDirectory string, filename string) {
 	configDirectory = configdir.LocalConfig("bb")
 	return configDirectory, "configuration.toml"

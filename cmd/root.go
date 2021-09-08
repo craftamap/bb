@@ -179,7 +179,7 @@ func initConfig() {
 		}
 	}
 
-	// Register Aliases for backward compability
+	// Register Aliases for backward compatibility
 	viper.RegisterAlias("username", configuration.CONFIG_KEY_AUTH_USERNAME)
 	viper.RegisterAlias("password", configuration.CONFIG_KEY_AUTH_PASSWORD)
 	viper.RegisterAlias("remote", configuration.CONFIG_KEY_GIT_REMOTE)
