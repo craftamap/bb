@@ -62,6 +62,7 @@ func SimpleStringValidator() Validator {
 // Entry contains all the data required for Validation and Convertion.
 type Entry struct {
 	Validator Validator
+	Hidden    bool
 }
 
 type Configuration map[string]Entry
@@ -72,6 +73,7 @@ var BbConfigurationValidation Configuration = map[string]Entry{
 	},
 	CONFIG_KEY_AUTH_PASSWORD: {
 		Validator: SimpleStringValidator(),
+		Hidden: true,
 	},
 	CONFIG_KEY_GIT_REMOTE: {
 		Validator: SimpleStringValidator(),
