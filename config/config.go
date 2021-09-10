@@ -73,7 +73,7 @@ var BbConfigurationValidation Configuration = map[string]Entry{
 	},
 	CONFIG_KEY_AUTH_PASSWORD: {
 		Validator: SimpleStringValidator(),
-		Hidden: true,
+		Hidden:    true,
 	},
 	CONFIG_KEY_GIT_REMOTE: {
 		Validator: SimpleStringValidator(),

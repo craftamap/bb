@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	Local bool
-	Get   bool
+	Local  bool
+	Get    bool
+	GetAll bool
 )
 
 func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
@@ -21,15 +22,26 @@ func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
 		Use:   "config",
 		Short: "configure bb",
 		Long:  "configure bb",
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			if Get && GetAll {
+				logging.Error("--get and --get-all are mutually exclusive")
+				return fmt.Errorf("") // FIXME: return empty error, so the command fails, but we can use our own method to print out the error message
+			}
+			return nil
+		},
 		Args: func(cmd *cobra.Command, args []string) error {
-			if Get {
+			if GetAll {
+				return cobra.ExactArgs(0)(cmd, args)
+			} else if Get {
 				return cobra.ExactArgs(1)(cmd, args)
 			} else {
 				return cobra.ExactArgs(2)(cmd, args)
 			}
 		},
 		Run: func(_ *cobra.Command, args []string) {
-			if Get {
+			if GetAll {
+				GetAllValues(args)
+			} else if Get {
 				GetValue(args)
 			} else {
 				SetValue(args)
@@ -39,8 +51,41 @@ func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
 
 	configCommand.Flags().BoolVar(&Local, "local", false, "local allows to modify the local configuration")
 	configCommand.Flags().BoolVar(&Get, "get", false, "gets a configuration value instead of setting it")
+	configCommand.Flags().BoolVar(&GetAll, "get-all", false, "prints out all configuration values of the selected configuration")
 
 	rootCmd.AddCommand(&configCommand)
+}
+
+func GetAllValues(_ []string) {
+	var configDirectory string
+	var filename string
+	if Local {
+		var err error
+		configDirectory, filename, err = config.GetLocalConfigurationPath()
+		if err != nil {
+			logging.Error(err)
+			return
+		}
+	} else {
+		configDirectory, filename = config.GetGlobalConfigurationPath()
+	}
+	path := filepath.Join(configDirectory, filename)
+	tmpVp, err := config.GetViperForPath(path)
+	if err != nil {
+		logging.Error(err)
+		return
+	}
+	for key, entry := range config.BbConfigurationValidation {
+		value := tmpVp.Get(key)
+		if value == nil {
+			continue
+		}
+		if entry.Hidden {
+			value = "(hidden)"
+		}
+
+		fmt.Printf("%s = %s\n", key, value)
+	}
 }
 
 func SetValue(args []string) {
