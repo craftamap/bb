@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/craftamap/bb/cmd/options"
 	"github.com/craftamap/bb/config"
@@ -21,7 +22,16 @@ func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
 	configCommand := cobra.Command{
 		Use:   "config",
 		Short: "configure bb",
-		Long:  "configure bb",
+		Long: fmt.Sprintf(`configure bb and change it's behaviour.
+bb sources configuration values from multiple sources:
+	1. The global configuration (usually located at $HOME/.config/bb/configuration.toml)
+	2. The local configuration (a .bb file in your repository root)
+	3. Environment variables
+	4. command-line flags
+This command allows you to modify and retrieve the configuration values without editing the configuration values by yourself. 
+
+The following keys are supported:
+	%s`, strings.Join(config.ConfigKeys, ", ")),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if Get && GetAll {
 				logging.Error("--get and --get-all are mutually exclusive")
@@ -49,7 +59,7 @@ func Add(rootCmd *cobra.Command, _ *options.GlobalOptions) {
 		},
 	}
 
-	configCommand.Flags().BoolVar(&Local, "local", false, "local allows to modify the local configuration")
+	configCommand.Flags().BoolVar(&Local, "local", false, "modify or retrieve the local configuration")
 	configCommand.Flags().BoolVar(&Get, "get", false, "gets a configuration value instead of setting it")
 	configCommand.Flags().BoolVar(&GetAll, "get-all", false, "prints out all configuration values of the selected configuration")
 

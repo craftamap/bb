@@ -19,6 +19,14 @@ const (
 	CONFIG_KEY_PR_SYNC_SYNC_METHOD     = "pr.sync.sync_method"
 )
 
+var ConfigKeys = []string{
+	CONFIG_KEY_AUTH_USERNAME,
+	CONFIG_KEY_AUTH_PASSWORD,
+	CONFIG_KEY_GIT_REMOTE,
+	CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL,
+	CONFIG_KEY_PR_SYNC_SYNC_METHOD,
+}
+
 type Validator func(interface{}) (interface{}, error)
 
 // Enum is just a string of a list.

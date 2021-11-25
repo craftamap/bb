@@ -185,7 +185,4 @@ func initConfig() {
 	viper.RegisterAlias("remote", configuration.CONFIG_KEY_GIT_REMOTE)
 	viper.RegisterAlias("git_protocol", configuration.CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL)
 	viper.RegisterAlias("sync-method", configuration.CONFIG_KEY_PR_SYNC_SYNC_METHOD)
-
-	logging.Debugf("%+v", viper.AllSettings())
-
 }
