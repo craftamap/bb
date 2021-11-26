@@ -11,25 +11,18 @@ require (
 	github.com/cli/safeexec v1.0.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fatih/color v1.12.0 // indirect
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/k0kubun/pp v3.0.1+incompatible // indirect
 	github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
 	github.com/ktrysmt/go-bitbucket v0.9.16
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.14 // indirect
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/muesli/reflow v0.3.0
 	github.com/pkg/browser v0.0.0-20210606212950-a7b7a6107d32
-	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/spf13/afero v1.6.0 // indirect
-	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v1.1.3
-	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.8.0
 	github.com/tidwall/pretty v1.2.0
 	github.com/wbrefvem/go-bitbucket v0.0.0-20190128183802-fc08fd046abb
@@ -39,6 +32,4 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210615190721-d04028783cf1 // indirect
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
-	google.golang.org/appengine v1.6.7 // indirect
-	gopkg.in/ini.v1 v1.62.0 // indirect
 )
