@@ -62,6 +62,16 @@ func CurrentHead() (string, error) {
 	output, err := run.PrepareCmd(headCmd).Output()
 	return firstLine(output), err
 }
+
+func RepoPath() (string, error) {
+	pathCmd, err := git.GitCommand("rev-parse", "--show-toplevel")
+	if err != nil {
+		return "", err
+	}
+	output, err := run.PrepareCmd(pathCmd).Output()
+	return firstLine(output), err
+}
+
 func firstLine(output []byte) string {
 	if i := bytes.IndexAny(output, "\n"); i >= 0 {
 		return string(output)[0:i]

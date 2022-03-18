@@ -2,8 +2,10 @@ package clone
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
+	"github.com/craftamap/bb/config"
 	"github.com/craftamap/bb/util/logging"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -24,7 +26,7 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		Run: func(cmd *cobra.Command, args []string) {
 			c := globalOpts.Client
 
-			gitProtocol := viper.GetString("git_protocol")
+			gitProtocol := viper.GetString(config.CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL)
 			if gitProtocol == "" || (gitProtocol != "ssh" && gitProtocol != "https") {
 				err := survey.AskOne(&survey.Select{
 					Message: "Please select a prefered protocol of cloning repositories",
@@ -34,8 +36,14 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					logging.Error(err)
 					return
 				}
-				viper.Set("git_protocol", gitProtocol)
-				viper.WriteConfig()
+
+				configDirectory, filename := config.GetGlobalConfigurationPath()
+				path := filepath.Join(configDirectory, filename)
+				_, err = config.ValidateAndUpdateEntry(path, config.CONFIG_KEY_REPO_CLONE_GIT_PROTOCOL, gitProtocol)
+				if err != nil {
+					logging.Error(err)
+					return
+				}
 			}
 
 			if len(args) == 0 {
