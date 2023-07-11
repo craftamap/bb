@@ -69,7 +69,6 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					logging.Error(err)
 					return
 				}
-
 			} else {
 				pr, err = c.PrMerge(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
 				if err != nil {
@@ -87,7 +86,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		},
 	}
 
-	mergeCmd.Flags().BoolVar(&CloseBranch, "close-source-branch", false, "close the source branch (pr setting if omited)")
+	mergeCmd.Flags().BoolVar(&CloseBranch, "close-source-branch", false, "close the source branch (pr setting if omitted)")
 
 	prCmd.AddCommand(mergeCmd)
 }

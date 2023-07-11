@@ -134,5 +134,4 @@ func (c Client) PipelinesLogs(repoOrga string, repoSlug, idOrUuid string, StepUu
 		IDOrUuid: idOrUuid,
 		StepUuid: StepUuid,
 	})
-
 }

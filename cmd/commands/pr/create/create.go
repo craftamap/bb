@@ -141,7 +141,6 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					}
 					reviewers = []string{}
 					for _, reviewer := range existingPr.Reviewers {
-						// TODO: make this memory efficient
 						reviewers = append(reviewers, reviewer.UUID)
 					}
 				}
@@ -191,7 +190,6 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				fmt.Println("None")
 			} else {
 				for _, reviewer := range reviewers {
-
 					name, ok := ReviewersNameCache[reviewer]
 					if ok {
 						fmt.Println("-", name)
@@ -365,7 +363,6 @@ func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser 
 			fmt.Println("None")
 		} else {
 			for _, reviewer := range reviewers {
-
 				name, ok := ReviewersNameCache[reviewer]
 				if ok {
 					fmt.Println("-", name)
@@ -457,7 +454,6 @@ func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser 
 				reviewers = append(reviewers, uuid)
 			}
 		}
-
 	}
 	return reviewers, nil
 }

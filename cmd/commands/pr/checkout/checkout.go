@@ -39,7 +39,8 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					return
 				}
 			} else {
-				//TODO: Error
+				logging.Error("no PR id specified")
+				return
 			}
 			pr, err := c.PrView(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))
 			if err != nil {
@@ -77,7 +78,6 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					return
 				}
 			}
-
 		},
 	}
 	prCmd.AddCommand(checkoutCmd)

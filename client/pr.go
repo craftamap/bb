@@ -83,7 +83,7 @@ type CommentContent struct {
 
 type CommentParent struct {
 	ID      int                    `mapstructure:"id"`
-	_Links  map[string]interface{} `mapstructure:"links"`
+	_Links  map[string]interface{} `mapstructure:"links"` //nolint:unused
 	Comment *Comment
 }
 

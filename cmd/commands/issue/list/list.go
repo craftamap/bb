@@ -18,6 +18,8 @@ var (
 	Priorities []string
 )
 
+const FLAG_OPTION_ALL = "ALL"
+
 func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	listCmd := &cobra.Command{
 		Use:     "list",
@@ -50,19 +52,19 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			}
 
 			for _, state := range States {
-				if strings.ToUpper(state) == "ALL" {
+				if strings.ToUpper(state) == FLAG_OPTION_ALL {
 					States = []string{"new", "open", "resolved", "on hold", "invalid", "duplicate", "wontfix", "closed"}
 				}
 			}
 
 			for _, typus := range Types {
-				if strings.ToUpper(typus) == "ALL" {
+				if strings.ToUpper(typus) == FLAG_OPTION_ALL {
 					Types = []string{"bug", "enhancement", "proposal", "task"}
 				}
 			}
 
 			for _, priority := range Priorities {
-				if strings.ToUpper(priority) == "ALL" {
+				if strings.ToUpper(priority) == FLAG_OPTION_ALL {
 					Priorities = []string{"trivial", "minor", "major", "critical", "blocker"}
 				}
 			}

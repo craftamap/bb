@@ -36,8 +36,8 @@ func (c Client) GetWorkspaceMembers(workspace string) (*Members, error) {
 		return nil, err
 	}
 	members := Members{}
-	mapstructure.Decode(response, &members)
-	return &members, nil
+	err = mapstructure.Decode(response, &members)
+	return &members, err
 }
 
 func (c Client) GetWorkspaces() (*Workspaces, error) {
@@ -49,6 +49,6 @@ func (c Client) GetWorkspaces() (*Workspaces, error) {
 	}
 
 	var workspaces *Workspaces
-	mapstructure.Decode(response, &workspaces)
-	return workspaces, nil
+	err = mapstructure.Decode(response, &workspaces)
+	return workspaces, err
 }

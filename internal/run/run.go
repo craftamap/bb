@@ -14,19 +14,19 @@ import (
 	"strings"
 )
 
-// Runnable is typically an exec.Cmd or its stub in tests
+// Runnable is typically an exec.Cmd or its stub in tests.
 type Runnable interface {
 	Output() ([]byte, error)
 	Run() error
 }
 
 // PrepareCmd extends exec.Cmd with extra error reporting features and provides a
-// hook to stub command execution in tests
+// hook to stub command execution in tests.
 var PrepareCmd = func(cmd *exec.Cmd) Runnable {
 	return &cmdWithStderr{cmd}
 }
 
-// SetPrepareCmd overrides PrepareCmd and returns a func to revert it back
+// SetPrepareCmd overrides PrepareCmd and returns a func to revert it back.
 func SetPrepareCmd(fn func(*exec.Cmd) Runnable) func() {
 	origPrepare := PrepareCmd
 	PrepareCmd = func(cmd *exec.Cmd) Runnable {
@@ -41,7 +41,7 @@ func SetPrepareCmd(fn func(*exec.Cmd) Runnable) func() {
 	}
 }
 
-// cmdWithStderr augments exec.Cmd by adding stderr to the error message
+// cmdWithStderr augments exec.Cmd by adding stderr to the error message.
 type cmdWithStderr struct {
 	*exec.Cmd
 }
@@ -78,7 +78,7 @@ func (c cmdWithStderr) Run() error {
 	return err
 }
 
-// CmdError provides more visibility into why an exec.Cmd had failed
+// CmdError provides more visibility into why an exec.Cmd had failed.
 type CmdError struct {
 	Stderr *bytes.Buffer
 	Args   []string

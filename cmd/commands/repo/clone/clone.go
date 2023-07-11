@@ -27,7 +27,7 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			gitProtocol := viper.GetString("git_protocol")
 			if gitProtocol == "" || (gitProtocol != "ssh" && gitProtocol != "https") {
 				err := survey.AskOne(&survey.Select{
-					Message: "Please select a prefered protocol of cloning repositories",
+					Message: "Please select a preferred protocol of cloning repositories",
 					Options: []string{"ssh", "https"},
 				}, &gitProtocol)
 				if err != nil {
@@ -35,7 +35,11 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					return
 				}
 				viper.Set("git_protocol", gitProtocol)
-				viper.WriteConfig()
+				err = viper.WriteConfig()
+				if err != nil {
+					logging.Error(err)
+					return
+				}
 			}
 
 			if len(args) == 0 {
@@ -88,7 +92,11 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					}
 
 					f := FormatRemoteURL(gitProtocol, splitted[0], splitted[1])
-					git.RunClone(f, []string{})
+					_, err = git.RunClone(f, []string{})
+					if err != nil {
+						logging.Error(err)
+						return
+					}
 				}
 			} else if len(args) == 1 {
 				splitted := strings.Split(args[0], "/")
@@ -100,7 +108,11 @@ func Add(repoCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					}
 
 					f := FormatRemoteURL(gitProtocol, splitted[0], splitted[1])
-					git.RunClone(f, []string{})
+					_, err = git.RunClone(f, []string{})
+					if err != nil {
+						logging.Error(err)
+						return
+					}
 				} else {
 					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), "too less or many args")
 					return
