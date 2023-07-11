@@ -2,13 +2,12 @@ package shared
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/charmbracelet/glamour"
-	"github.com/cli/cli/pkg/surveyext"
 	"github.com/craftamap/bb/client"
 	bbgit "github.com/craftamap/bb/git"
+	"github.com/craftamap/bb/util/editor"
 	"github.com/craftamap/bb/util/logging"
 	"github.com/logrusorgru/aurora"
 )
@@ -118,7 +117,7 @@ func AskQuestionsForCreateOrUpdate(io IssueOptions, bbrepo *bbgit.BitbucketRepo,
 }
 
 func modifyDescription(body string) (string, error) {
-	body, err := surveyext.Edit("vim", "bb-issue*.md", body, os.Stdin, os.Stdout, os.Stderr, nil)
+	body, err := editor.OpenInEditor(body, "bb-issue*.md")
 	if err != nil {
 		return "", err
 	}

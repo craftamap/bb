@@ -2,16 +2,15 @@ package create
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/craftamap/bb/client"
+	"github.com/craftamap/bb/util/editor"
 	"github.com/craftamap/bb/util/logging"
 	"github.com/ktrysmt/go-bitbucket"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/charmbracelet/glamour"
 	"github.com/cli/cli/git"
-	"github.com/cli/cli/pkg/surveyext"
 	"github.com/cli/cli/utils"
 	"github.com/craftamap/bb/cmd/options"
 	bbgit "github.com/craftamap/bb/git"
@@ -308,7 +307,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 }
 
 func modifyBody(body string) (string, error) {
-	body, err := surveyext.Edit("vim", "", body, os.Stdin, os.Stdout, os.Stderr, nil)
+	body, err := editor.OpenInEditor(body, "*.md")
 	if err != nil {
 		return "", err
 	}

@@ -2,14 +2,13 @@ package comment
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/charmbracelet/glamour"
-	"github.com/cli/cli/pkg/surveyext"
 	"github.com/craftamap/bb/cmd/options"
+	"github.com/craftamap/bb/util/editor"
 	"github.com/craftamap/bb/util/logging"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
@@ -42,7 +41,7 @@ func Add(issueCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 
-			body, err := surveyext.Edit("vim", "bb-issuecomment*.md", "", os.Stdin, os.Stdout, os.Stderr, nil)
+			body, err := editor.OpenInEditor("", "bb-issuecomment*.md")
 			if err != nil {
 				logging.Error(err)
 				return
