@@ -99,7 +99,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 
-			defaultReviewers, err := c.GetDefaultReviewers(bbrepo.RepoOrga, bbrepo.RepoSlug)
+			defaultReviewers, err := c.GetEffectiveDefaultReviewers(bbrepo.RepoOrga, bbrepo.RepoSlug)
 			if err != nil {
 				logging.Error(err)
 				return
@@ -110,11 +110,11 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				logging.Warning("Can't get the current user - this means that the default reviewers won't be added to this pull request. Make sure to grant the account-scope for your access token")
 			} else {
 				for _, rev := range defaultReviewers.Values {
-					if currentUser.Uuid != rev.UUID {
-						reviewers = append(reviewers, rev.UUID)
+					if currentUser.Uuid != rev.User.UUID {
+						reviewers = append(reviewers, rev.User.UUID)
 					}
 					// Add the user to the cache in any case
-					ReviewersNameCache[rev.UUID] = rev.DisplayName
+					ReviewersNameCache[rev.User.UUID] = rev.User.DisplayName
 				}
 			}
 
@@ -394,7 +394,7 @@ func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser 
 				nameToUUID[name] = rev
 			}
 			if len(listOfNames) == 0 {
-				logging.Warning("No reviwers to remove available")
+				logging.Warning("No reviewers to remove available")
 				continue
 			}
 			var removedReviewers []string
@@ -421,8 +421,15 @@ func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser 
 				logging.Warning(fmt.Sprint("Could not get workspace members - create the pr without reviewers and add them manually using the browser", err))
 				continue
 			}
-			logging.Debugf("members: %+v", members)
+
 			var nonReviewersMembers []string
+			// populate with the name cache first
+			for uuid := range ReviewersNameCache {
+				if !stringInSlice(uuid, reviewers) && uuid != currentUser.Uuid {
+					nonReviewersMembers = append(nonReviewersMembers, uuid)
+				}
+			}	
+			// then use workspace members if available
 			for _, member := range members.Values {
 				ReviewersNameCache[member.User.UUID] = member.User.DisplayName
 				if !stringInSlice(member.User.UUID, reviewers) && member.User.UUID != currentUser.Uuid {
