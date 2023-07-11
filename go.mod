@@ -18,7 +18,6 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.16.0
 	github.com/tidwall/pretty v1.2.1
-	github.com/wbrefvem/go-bitbucket v0.0.0-20190128183802-fc08fd046abb
 )
 
 require (
