@@ -10,13 +10,16 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
-	"github.com/wbrefvem/go-bitbucket"
 )
 
 var (
 	Web   bool
 	State string
 )
+
+type LinkWrapper struct {
+	Href string `mapstructure:"href"`
+}
 
 func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	listCmd := &cobra.Command{
@@ -38,8 +41,8 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					logging.Error(err)
 				}
 
-				linkWrapper := repo.Links["Html"].(*bitbucket.SubjectTypesRepositoryEvents)
-				link := linkWrapper.Href + "/pull-requests"
+				linkWrapper := repo.Links["Html"].(map[string]any)
+				link := linkWrapper["Href"].(string) + "/pull-requests"
 				err = browser.OpenURL(link)
 				if err != nil {
 					logging.Error(err)
