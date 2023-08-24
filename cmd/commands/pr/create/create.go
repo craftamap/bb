@@ -35,8 +35,9 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		Use:   "create",
 		Short: "Create a pull request",
 		Annotations: map[string]string{
-			"RequiresClient":     "true",
-			"RequiresRepository": "true",
+			"RequiresClient":       "true",
+			"RequiresRepository":   "true",
+			"RequiresFSRepository": "true",
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			// Initialisation

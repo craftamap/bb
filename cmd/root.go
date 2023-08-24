@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/craftamap/bb/util/logging"
 
@@ -33,23 +34,42 @@ var (
 		Long:    "Work seamlessly with Bitbucket.org from the command line.",
 		Example: `$ bb pr list`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			username := viper.GetString("username")
-			password := viper.GetString("password")
-
 			if _, ok := cmd.Annotations["RequiresRepository"]; ok {
-				bbrepo, err := bbgit.GetBitbucketRepo(remoteName)
-				if err != nil {
-					logging.Error(err)
-					os.Exit(1)
-				}
-				if !bbrepo.IsBitbucketOrg() {
-					fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), "Are you sure this is a bitbucket repo?")
-					os.Exit(1)
+				if repository != "" {
+					if _, ok := cmd.Annotations["RequiresFSRepository"]; ok {
+						logging.Error("this command requires to be run in the repository directory directly.")
+						os.Exit(1)
+					}
+
+					splitted := strings.Split(repository, "/")
+					if len(splitted) != 2 {
+						logging.Error(fmt.Sprintf("repository %s is not in valid format. Please pass it in the repoOrga/repoSlug format.", repository))
+						os.Exit(1)
+					}
+					globalOpts.BitbucketRepo = &bbgit.BitbucketRepo{
+						RepoOrga: splitted[0],
+						RepoSlug: splitted[1],
+					}
+					globalOpts.IsFSRepo = false
+				} else {
+					bbrepo, err := bbgit.GetBitbucketRepo(remoteName)
+					if err != nil {
+						logging.Error(err)
+						os.Exit(1)
+					}
+					if !bbrepo.IsBitbucketOrg() {
+						fmt.Printf("%s%s%s\n", aurora.Red(":: "), aurora.Bold("An error occurred: "), "Are you sure this is a bitbucket repo?")
+						os.Exit(1)
+					}
+
+					globalOpts.BitbucketRepo = bbrepo
+					globalOpts.IsFSRepo = true
 				}
 
-				globalOpts.BitbucketRepo = bbrepo
 			}
 
+			username := viper.GetString("username")
+			password := viper.GetString("password")
 			if _, ok := cmd.Annotations["RequiresClient"]; ok {
 				globalOpts.Client = &client.Client{
 					Username: username,
@@ -72,6 +92,7 @@ var (
 
 	username   string
 	password   string
+	repository string
 	remoteName string
 )
 
@@ -85,6 +106,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/bb)")
 	rootCmd.PersistentFlags().StringVar(&username, "username", "", "username")
 	rootCmd.PersistentFlags().StringVar(&password, "password", "", "app password")
+	rootCmd.PersistentFlags().StringVar(&repository, "repository", "", "for most commands, the repository can be specified")
 	rootCmd.PersistentFlags().StringVar(&remoteName, "remote", "origin", "if you are in a repository and don't want to interact with the default remote, you can change it")
 	rootCmd.PersistentFlags().BoolVar(&logging.PrintDebugLogs, "debug", false, "enabling this flag allows debug logs to be printed")
 
