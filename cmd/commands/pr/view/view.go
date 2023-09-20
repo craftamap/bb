@@ -42,7 +42,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					logging.Error(err)
 					return
 				}
-			} else {
+			} else if globalOpts.IsFSRepo {
 				branchName, err := git.CurrentBranch()
 				if err != nil {
 					logging.Error(err)
@@ -59,6 +59,9 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 					return
 				}
 				id = prs.Values[0].ID
+			} else {
+				logging.Warning("Not in a repository and no PR selected")
+				return
 			}
 
 			pr, err := c.PrView(bbrepo.RepoOrga, bbrepo.RepoSlug, fmt.Sprintf("%d", id))

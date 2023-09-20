@@ -33,8 +33,9 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 		Long:  "synchronizes the current pull request with new changes in it's destination branch by either merging or rebasing the changes locally. If rebasing or merging fails because of an conflict, the merge must be resolved manually.",
 		Short: "Sync a pull request locally",
 		Annotations: map[string]string{
-			"RequiresClient":     "true",
-			"RequiresRepository": "true",
+			"RequiresClient":       "true",
+			"RequiresRepository":   "true",
+			"RequiresFSRepository": "true",
 		},
 		PreRunE: func(cmd *cobra.Command, _ []string) error {
 			// In order to check if the method exists in the config, we need to check here

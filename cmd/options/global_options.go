@@ -7,5 +7,6 @@ import (
 
 type GlobalOptions struct {
 	BitbucketRepo *bbgit.BitbucketRepo
+	IsFSRepo      bool
 	Client        *client.Client
 }
