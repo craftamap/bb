@@ -106,7 +106,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/bb)")
 	rootCmd.PersistentFlags().StringVar(&username, "username", "", "username")
 	rootCmd.PersistentFlags().StringVar(&password, "password", "", "app password")
-	rootCmd.PersistentFlags().StringVar(&repository, "repository", "", "for most commands, the repository can be specified")
+	rootCmd.PersistentFlags().StringVar(&repository, "repository", "", "for most commands, the repository can be specified in the repoOrga/repoSlug format")
 	rootCmd.PersistentFlags().StringVar(&remoteName, "remote", "origin", "if you are in a repository and don't want to interact with the default remote, you can change it")
 	rootCmd.PersistentFlags().BoolVar(&logging.PrintDebugLogs, "debug", false, "enabling this flag allows debug logs to be printed")
 
