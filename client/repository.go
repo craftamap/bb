@@ -31,8 +31,13 @@ type Repository struct {
 	// UpdatedOn   time.Time              `mapstructure:"UpdatedOn"`
 }
 
-type DefaultReviewers struct {
-	Values []*Account `json:"values"`
+type EffectiveDefaultReviewer struct {
+	Type         string
+	ReviewerType string
+	User         *Account
+}
+type EffectiveDefaultReviewers struct {
+	Values []*EffectiveDefaultReviewer `mapstructure:"EffectiveDefaultReviewers"`
 }
 
 func (c Client) RepositoriesForWorkspace(repoOrga string) ([]Repository, error) {
@@ -76,19 +81,19 @@ func (c Client) RepositoryGet(repoOrga string, repoSlug string) (*Repository, er
 	return &repo, nil
 }
 
-func (c Client) GetDefaultReviewers(repoOrga string, repoSlug string) (*DefaultReviewers, error) {
+func (c Client) GetEffectiveDefaultReviewers(repoOrga string, repoSlug string) (*EffectiveDefaultReviewers, error) {
 	client := bitbucket.NewBasicAuth(c.Username, c.Password)
 	opt := &bitbucket.RepositoryOptions{
 		Owner:    repoOrga,
 		RepoSlug: repoSlug,
 	}
 
-	response, err := client.Repositories.Repository.ListDefaultReviewers(opt)
+	response, err := client.Repositories.Repository.ListEffectiveDefaultReviewers(opt)
 	if err != nil {
 		return nil, err
 	}
 
-	defaultReviewers := DefaultReviewers{}
+	defaultReviewers := EffectiveDefaultReviewers{}
 	err = mapstructure.Decode(response, &defaultReviewers)
 	if err != nil {
 		return nil, err
