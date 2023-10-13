@@ -428,7 +428,7 @@ func manageReviewers(bbrepo *bbgit.BitbucketRepo, c *client.Client, currentUser 
 				if !stringInSlice(uuid, reviewers) && uuid != currentUser.Uuid {
 					nonReviewersMembers = append(nonReviewersMembers, uuid)
 				}
-			}	
+			}
 			// then use workspace members if available
 			for _, member := range members.Values {
 				ReviewersNameCache[member.User.UUID] = member.User.DisplayName
