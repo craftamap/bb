@@ -1,0 +1,68 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+    # you may remove this if you don't need go generate
+    - go generate ./...
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    ldflags: -s -w -X github.com/craftamap/bb/cmd.Version={{ .Version }} -X github.com/craftamap/bb/cmd.CommitSHA={{ .Commit }}
+
+archives:
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of uname.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+    - goos: windows
+      format: zip
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+brews:
+  - goarm: 6
+    repository:
+      owner: craftamap
+      name: homebrew-tap
+    commit_author:
+      name: "Fabian Siegel"
+      email: "fabians1999@gmail.com"
+    homepage: "github.com/craftamap/bb"
+    description: "inoffical Bitbucket.org command line tool"
+
+nfpms:
+  -
+    vendor: craftamap
+    maintainer: "Fabian Siegel <fabians1999@gmail.com>"
+    description: "inoffical Bitbucket.org command line tool"
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin
+
+# The lines beneath this are called `modelines`. See `:help modeline`
+# Feel free to remove those if you don't want/use them.
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
