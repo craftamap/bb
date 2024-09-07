@@ -1,8 +1,6 @@
 module github.com/craftamap/bb
 
-go 1.21.0
-
-toolchain go1.23.1
+go 1.23.1
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
@@ -46,6 +44,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/muesli/termenv v0.15.3-0.20240618155329-98d742f6907a // indirect
+	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sagikazarmark/locafero v0.6.0 // indirect
