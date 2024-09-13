@@ -3,7 +3,7 @@ package api
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -67,7 +67,7 @@ func Add(rootCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			defer response.Body.Close()
 
-			resBody, err := ioutil.ReadAll(response.Body)
+			resBody, err := io.ReadAll(response.Body)
 			if err != nil {
 				logging.Error(err)
 				return

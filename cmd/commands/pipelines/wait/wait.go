@@ -60,7 +60,6 @@ func Add(pipelinesCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				}
 				time.Sleep(1 * time.Second)
 			}
-
 		},
 	}
 	waitCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "verbosity of the command; logs the current state")

@@ -3,7 +3,6 @@ package client
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 
 	"github.com/ktrysmt/go-bitbucket"
 )
@@ -26,7 +25,7 @@ func (c Client) DiffGet(repoOrga string, repoSlug string, spec string) (string, 
 		return "", fmt.Errorf("responseBody is no io.ReadCloser")
 	}
 
-	byteBody, err := ioutil.ReadAll(responseBody)
+	byteBody, err := io.ReadAll(responseBody)
 	if err != nil {
 		return "", err
 	}
