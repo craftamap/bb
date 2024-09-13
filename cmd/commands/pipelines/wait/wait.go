@@ -26,7 +26,7 @@ func Add(pipelinesCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 	waitCmd := &cobra.Command{
 		Use:   "wait <number of pipeline>",
 		Short: "wait until a specific pipeline execution has finished",
-		Long:  "wait until a specific pipeline execution has finished. On it's own, this command, this is not particulary useful, but it can be combined with other commands, like notify-send, to send you a notification when a pipeline is done.",
+		Long:  "wait until a specific pipeline execution has finished. On it's own, this command, this is not particularly useful, but it can be combined with other commands, like notify-send, to send you a notification when a pipeline is done.",
 		Annotations: map[string]string{
 			"RequiresClient":     "true",
 			"RequiresRepository": "true",
