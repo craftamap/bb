@@ -98,8 +98,14 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 			cmdQueue = append(cmdQueue, []string{"git", "fetch", remoteName, pr.Destination.Branch.Name})
 			if Method == MethodOptionRebase {
 				cmdQueue = append(cmdQueue, []string{"git", "rebase", remoteDestinationBranch})
+				if Push {
+					cmdQueue = append(cmdQueue, []string{"git", "push", "--force-with-lease"})
+				}
 			} else {
 				cmdQueue = append(cmdQueue, []string{"git", "merge", "--commit", remoteDestinationBranch})
+				if Push {
+					cmdQueue = append(cmdQueue, []string{"git", "push"})
+				}
 			}
 
 			var builder strings.Builder
@@ -125,18 +131,11 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				return
 			}
 
-			if Push {
-				cmdQueue = [][]string{{"git", "push"}}
-				err = processCmdQueue(cmdQueue)
-				if err != nil {
-					logging.Error(err)
-				}
-			}
 		},
 	}
 
 	syncCmd.Flags().StringVar(&Method, "method", "merge", "sync using merge or rebase (merge/rebase)")
-	syncCmd.Flags().BoolVar(&Push, "push", true, "push after merge/rebase")
+	syncCmd.Flags().BoolVar(&Push, "push", true, "push after merge/push --force-with-lease after rebase")
 
 	prCmd.AddCommand(syncCmd)
 }
@@ -148,6 +147,7 @@ func processCmdQueue(cmdQueue [][]string) error {
 		if err != nil {
 			return err
 		}
+		logging.Note(strings.Join(args, " "))
 		cmd := exec.Command(exe, args[1:]...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
