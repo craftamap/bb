@@ -63,7 +63,7 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 
 			if Json {
 				json_str, err := json.MarshalIndent(prs, "", " ")
-				if err == nil {
+				if err != nil {
 					logging.Error(err)
 				}
 				fmt.Println(string(json_str))
