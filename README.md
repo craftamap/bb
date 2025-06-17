@@ -52,17 +52,22 @@ go build
 
 ## Set-Up
 
-You need to authenticate with your credentials first. You should generate a
-[app password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/)
+You need to authenticate with your credentials first. 
+You can either use a [Scoped API Token](https://id.atlassian.com/manage-profile/security/api-tokens)
+or an [app password (deprecated)](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/)
 for that. Make sure to grant read and write access to the features you want to use.
 (**Recommended**:Repositories: Read/Write, Pull Requests: Read/Write, 
-Pipelines: Read/Write, Account: Email/Read, Workspace membership: Read/Write)
+Pipelines: Read/Write, Account: Email/Read, Workspace membership: Read/Write).
 
 Run the following command to enter your username and password:
 
 ```bash
 bb auth login
 ```
+
+If using an Scoped API Token, use your email address as the username and the API
+Token as the password. If using an app password, use your bitbucket username as
+username and the app password as password.
 
 Your credentials will be stored to `~/.config/bb/configuration.toml`.
 
