@@ -53,7 +53,7 @@ go build
 ## Set-Up
 
 You need to authenticate with your credentials first. 
-You can either use a [Scoped API Token](https://id.atlassian.com/manage-profile/security/api-tokens)
+You can either use a [Scoped API Token](https://support.atlassian.com/bitbucket-cloud/docs/api-tokens/)
 or an [app password (deprecated)](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/)
 for that. Make sure to grant read and write access to the features you want to use.
 (**Recommended**:Repositories: Read/Write, Pull Requests: Read/Write, 
