@@ -1,6 +1,7 @@
 package list
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -15,6 +16,7 @@ import (
 var (
 	Web   bool
 	State string
+	Json  bool
 )
 
 type LinkWrapper struct {
@@ -59,15 +61,25 @@ func Add(prCmd *cobra.Command, globalOpts *options.GlobalOptions) {
 				logging.Error(err)
 			}
 
-			fmt.Println()
-			fmt.Printf("%sShowing %d of %d open pull requests in %s/%s\n", aurora.Blue(" :: "), len(prs.Values), prs.Size, bbrepo.RepoOrga, bbrepo.RepoSlug)
-			fmt.Println()
-			for _, pr := range prs.Values {
-				fmt.Printf("#%03d  %s   %s -> %s\n", aurora.Green(pr.ID), pr.Title, pr.Source.Branch.Name, pr.Destination.Branch.Name)
+			if Json {
+				json_str, err := json.MarshalIndent(prs, "", " ")
+				if err != nil {
+					logging.Error(err)
+				}
+				fmt.Println(string(json_str))
+			} else {
+				fmt.Println()
+				fmt.Printf("%sShowing %d of %d open pull requests in %s/%s\n", aurora.Blue(" :: "), len(prs.Values), prs.Size, bbrepo.RepoOrga, bbrepo.RepoSlug)
+				fmt.Println()
+				for _, pr := range prs.Values {
+					fmt.Printf("#%03d  %s   %s -> %s\n", aurora.Green(pr.ID), pr.Title, pr.Source.Branch.Name, pr.Destination.Branch.Name)
+				}
 			}
 		},
 	}
-	listCmd.Flags().StringVar(&State, "state", "open", "Filter by state: {open|merged|declined|superseded}")
+	listCmd.Flags().
+		StringVar(&State, "state", "open", "Filter by state: {open|merged|declined|superseded}")
+	listCmd.Flags().BoolVar(&Json, "json", false, "Output to json")
 	listCmd.Flags().BoolVar(&Web, "web", false, "view pull requests in your browser")
 	prCmd.AddCommand(listCmd)
 }
